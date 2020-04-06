@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -32,24 +31,9 @@ func realMain(args []string) error {
 		Timeout: 5 * time.Second,
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	body, err := download(ctx, httpClient, url)
 	if err != nil {
-		return fmt.Errorf("cannot make HTTP request: %w", err)
-	}
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("cannot get response from server: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("invalid response (status code: %d)", resp.StatusCode)
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("cannot read response: %w", err)
+		return fmt.Errorf("cannot download file from %q: %w", url, err)
 	}
 
 	sess := session.New()
