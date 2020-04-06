@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -17,21 +18,19 @@ const (
 	timeFormat = "2006-01-02-15-04-00"
 )
 
-func main() {
-	if err := realMain(os.Args); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+func HandleRequest(ctx context.Context) error {
+	url := os.Getenv("URL")
+	bucket := os.Getenv("BUCKET")
+	keyPrefix := os.Getenv("KEY_PREFIX")
+
+	return do(ctx, url, bucket, keyPrefix)
 }
 
-func realMain(args []string) error {
-	if len(args) < 4 {
-		return fmt.Errorf("insufficient arguments")
-	}
-	url, bucket, keyPrefix := args[1], args[2], args[3]
+func main() {
+	lambda.Start(HandleRequest)
+}
 
-	ctx := context.Background()
-
+func do(ctx context.Context, url, bucket, keyPrefix string) error {
 	httpClient := http.Client{
 		Timeout: 5 * time.Second,
 	}
