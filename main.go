@@ -15,23 +15,38 @@ import (
 	"github.com/aws/aws-xray-sdk-go/xray"
 )
 
+const (
+	defaultTimezone = "UTC"
+)
+
 func HandleRequest(ctx context.Context) error {
 	url := os.Getenv("URL")
 	bucket := os.Getenv("BUCKET")
 	keyPrefix := os.Getenv("KEY_PREFIX")
 
+	timezone := os.Getenv("TIMEZONE")
+	if timezone == "" {
+		timezone = defaultTimezone
+	}
+
 	log.Printf("url: %q", url)
 	log.Printf("bucket: %q", bucket)
 	log.Printf("key prefix: %q", keyPrefix)
+	log.Printf("timezone: %q", timezone)
 
-	return do(ctx, url, bucket, keyPrefix)
+	return do(ctx, url, bucket, keyPrefix, timezone)
 }
 
 func main() {
 	lambda.Start(HandleRequest)
 }
 
-func do(ctx context.Context, url, bucket, keyPrefix string) error {
+func do(ctx context.Context, url, bucket, keyPrefix, timezone string) error {
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		return fmt.Errorf("cannot retrieve timezone %q; %w", timezone, err)
+	}
+
 	httpClient := xray.Client(&http.Client{
 		Timeout: 5 * time.Second,
 	})
@@ -48,7 +63,7 @@ func do(ctx context.Context, url, bucket, keyPrefix string) error {
 	xray.AWS(api.Client)
 	s3Client := newS3Client(api)
 
-	now := time.Now()
+	now := time.Now().In(loc)
 	key := composeKey(keyPrefix, now, ext)
 
 	log.Printf("uploading to bucket: %s key: %s", bucket, key)
