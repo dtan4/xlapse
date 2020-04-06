@@ -6,10 +6,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+)
+
+const (
+	timeFormat = "2006-01-02-15-04-00"
 )
 
 func main() {
@@ -23,7 +28,7 @@ func realMain(args []string) error {
 	if len(args) < 4 {
 		return fmt.Errorf("insufficient arguments")
 	}
-	url, bucket, key := args[1], args[2], args[3]
+	url, bucket, keyPrefix := args[1], args[2], args[3]
 
 	ctx := context.Background()
 
@@ -31,7 +36,7 @@ func realMain(args []string) error {
 		Timeout: 5 * time.Second,
 	}
 
-	body, _, err := download(ctx, httpClient, url)
+	body, ext, err := download(ctx, httpClient, url)
 	if err != nil {
 		return fmt.Errorf("cannot download file from %q: %w", url, err)
 	}
@@ -39,6 +44,11 @@ func realMain(args []string) error {
 	sess := session.New()
 	api := s3.New(sess)
 	s3Client := newS3Client(api)
+
+	key := filepath.Join(keyPrefix, time.Now().Format(timeFormat))
+	if ext != "" {
+		key += "." + ext
+	}
 
 	if err := s3Client.UploadToS3(ctx, bucket, key, bytes.NewReader(body)); err != nil {
 		return fmt.Errorf("cannot upload downloaded file to S3 (bucket: %q, key: %q): %w", bucket, key, err)
