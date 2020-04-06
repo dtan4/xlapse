@@ -1,1 +1,1 @@
-# image-to-s3-function
+# remote-file-to-s3-function

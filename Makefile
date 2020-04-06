@@ -1,4 +1,4 @@
-NAME := image-to-s3-function
+NAME := remote-file-to-s3-function
 
 LDFLAGS  := -ldflags="-s -w"
 
