@@ -1,12 +1,12 @@
-NAME    := s3url
+NAME := image-to-s3-function
 
 LDFLAGS  := -ldflags="-s -w"
 
-.DEFAULT_GOAL := bin/$(NAME)
+.DEFAULT_GOAL := build
 
 export GO111MODULE=on
 
-bin/$(NAME):
+build:
 	go build $(LDFLAGS) -o bin/$(NAME)
 
 test:

@@ -1,12 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 func main() {
@@ -17,14 +21,14 @@ func main() {
 }
 
 func realMain(args []string) error {
-	if len(args) < 3 {
+	if len(args) < 4 {
 		return fmt.Errorf("insufficient arguments")
 	}
-	url, filename := args[1], args[2]
+	url, bucket, key := args[1], args[2], args[3]
 
 	ctx := context.Background()
 
-	client := http.Client{
+	httpClient := http.Client{
 		Timeout: 5 * time.Second,
 	}
 
@@ -33,7 +37,7 @@ func realMain(args []string) error {
 		return fmt.Errorf("cannot make HTTP request: %w", err)
 	}
 
-	resp, err := client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("cannot get response from server: %w", err)
 	}
@@ -43,14 +47,17 @@ func realMain(args []string) error {
 		return fmt.Errorf("invalid response (status code: %d)", resp.StatusCode)
 	}
 
-	out, err := os.Create(filename)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("cannot create file %q: %w", filename, err)
+		return fmt.Errorf("cannot read response: %w", err)
 	}
-	defer out.Close()
 
-	if _, err := io.Copy(out, resp.Body); err != nil {
-		return fmt.Errorf("cannot save response to file %q: %w", filename, err)
+	sess := session.New()
+	api := s3.New(sess)
+	s3Client := newS3Client(api)
+
+	if err := s3Client.UploadToS3(ctx, bucket, key, bytes.NewReader(body)); err != nil {
+		return fmt.Errorf("cannot upload downloaded file to S3 (bucket: %q, key: %q): %w", bucket, key, err)
 	}
 
 	return nil
