@@ -31,7 +31,7 @@ func realMain(args []string) error {
 		Timeout: 5 * time.Second,
 	}
 
-	body, err := download(ctx, httpClient, url)
+	body, _, err := download(ctx, httpClient, url)
 	if err != nil {
 		return fmt.Errorf("cannot download file from %q: %w", url, err)
 	}

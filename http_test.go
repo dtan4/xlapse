@@ -10,18 +10,49 @@ import (
 
 func TestDownload(t *testing.T) {
 	testcases := map[string]struct {
-		url        string
-		body       string
-		statusCode int
-		want       string
-		wantErr    error
+		url         string
+		body        string
+		contentType string
+		statusCode  int
+		want        string
+		wantExt     string
+		wantErr     error
 	}{
-		"success": {
-			url:        "https://example.com/foo.jpg",
-			body:       "foo",
-			statusCode: http.StatusOK,
-			want:       "foo\n",
-			wantErr:    nil,
+		"success with png": {
+			url:         "https://example.com/foo.png",
+			body:        "foo",
+			contentType: "image/png",
+			statusCode:  http.StatusOK,
+			want:        "foo\n",
+			wantExt:     "png",
+			wantErr:     nil,
+		},
+		"success with jpg": {
+			url:         "https://example.com/foo.jpg",
+			body:        "foo",
+			contentType: "image/jpeg",
+			statusCode:  http.StatusOK,
+			want:        "foo\n",
+			wantExt:     "jpg",
+			wantErr:     nil,
+		},
+		"success with gif": {
+			url:         "https://example.com/foo.gif",
+			body:        "foo",
+			contentType: "image/gif",
+			statusCode:  http.StatusOK,
+			want:        "foo\n",
+			wantExt:     "gif",
+			wantErr:     nil,
+		},
+		"success with text": {
+			url:         "https://example.com/foo.gif",
+			body:        "foo",
+			contentType: "text/html",
+			statusCode:  http.StatusOK,
+			want:        "foo\n",
+			wantExt:     "",
+			wantErr:     nil,
 		},
 		"404": {
 			url:        "https://example.com/foo.jpg",
@@ -37,19 +68,24 @@ func TestDownload(t *testing.T) {
 			ctx := context.Background()
 
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", tc.contentType)
 				w.WriteHeader(tc.statusCode)
 				fmt.Fprintln(w, "foo")
 			}))
 			defer ts.Close()
 
-			got, err := download(ctx, *ts.Client(), ts.URL)
+			body, ext, err := download(ctx, *ts.Client(), ts.URL)
 			if tc.wantErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got %s", err)
 				}
 
-				if string(got) != tc.want {
-					t.Errorf("want %q, got %q", tc.want, string(got))
+				if string(body) != tc.want {
+					t.Errorf("want body %q, got %q", tc.want, string(body))
+				}
+
+				if ext != tc.wantExt {
+					t.Errorf("want ext %q, got %q", tc.wantExt, ext)
 				}
 			} else {
 				if err == nil {
