@@ -32,3 +32,4 @@ Resources:
           URL: https://example.com/foo.png
           BUCKET: example-bucket
           KEY_PREFIX: example-prefix
+          TIMEZONE: Asia/Tokyo

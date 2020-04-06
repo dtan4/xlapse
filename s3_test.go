@@ -78,6 +78,11 @@ func TestUploadToS3(t *testing.T) {
 }
 
 func TestComposeKey(t *testing.T) {
+	jst, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		t.Fatalf("cannot retrieve Asia/Tokyo timezone: %s", err)
+	}
+
 	testcases := map[string]struct {
 		prefix string
 		now    time.Time
@@ -107,6 +112,12 @@ func TestComposeKey(t *testing.T) {
 			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
 			ext:    "",
 			want:   "awesome/2020/04/06/2020-04-06-11-22-33",
+		},
+		"JST": {
+			prefix: "awesome",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, jst),
+			ext:    "png",
+			want:   "awesome/2020/04/06/2020-04-06-11-22-33.png",
 		},
 	}
 
