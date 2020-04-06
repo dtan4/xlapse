@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -53,7 +54,9 @@ func do(ctx context.Context, url, bucket, keyPrefix string) error {
 	xray.AWS(api.Client)
 	s3Client := newS3Client(api)
 
-	key := filepath.Join(keyPrefix, time.Now().Format(timeFormat))
+	now := time.Now()
+	// {keyPrefix}/2006/01/02/2006-01-02-15-04-00.png
+	key := filepath.Join(keyPrefix, strconv.Itoa(now.Year()), strconv.Itoa(int(now.Month())), strconv.Itoa(now.Day()), time.Now().Format(timeFormat))
 	if ext != "" {
 		key += "." + ext
 	}
