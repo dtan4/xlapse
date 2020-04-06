@@ -55,7 +55,7 @@ func do(ctx context.Context, url, bucket, keyPrefix string) error {
 
 	now := time.Now()
 	// {keyPrefix}/2006/01/02/2006-01-02-15-04-00.png
-	key := filepath.Join(keyPrefix, fmt.Sprintf("%4d", now.Year()), fmt.Sprintf("%2d", now.Month()), fmt.Sprintf("%2d", now.Day()), time.Now().Format(timeFormat))
+	key := filepath.Join(keyPrefix, fmt.Sprintf("%4d/%2d/%2d", now.Year(), now.Month(), now.Day()), time.Now().Format(timeFormat))
 	if ext != "" {
 		key += "." + ext
 	}
