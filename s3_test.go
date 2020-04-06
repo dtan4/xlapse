@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -71,6 +72,49 @@ func TestUploadToS3(t *testing.T) {
 				if err.Error() != tc.expectErr.Error() {
 					t.Errorf("want error: %q, got: %q", tc.expectErr.Error(), err.Error())
 				}
+			}
+		})
+	}
+}
+
+func TestComposeKey(t *testing.T) {
+	testcases := map[string]struct {
+		prefix string
+		now    time.Time
+		ext    string
+		want   string
+	}{
+		"no prefix but ext": {
+			prefix: "",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "png",
+			want:   "2020/04/06/2020-04-06-11-22-33.png",
+		},
+		"no prefix and no ext": {
+			prefix: "",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "",
+			want:   "2020/04/06/2020-04-06-11-22-33",
+		},
+		"prefix and ext": {
+			prefix: "awesome",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "png",
+			want:   "awesome/2020/04/06/2020-04-06-11-22-33.png",
+		},
+		"prefix but no ext": {
+			prefix: "awesome",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "",
+			want:   "awesome/2020/04/06/2020-04-06-11-22-33",
+		},
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			got := composeKey(tc.prefix, tc.now, tc.ext)
+			if got != tc.want {
+				t.Errorf("want: %q, got: %q", tc.want, got)
 			}
 		})
 	}

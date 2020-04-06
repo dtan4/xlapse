@@ -4,10 +4,16 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"path/filepath"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+)
+
+const (
+	timeFormat = "2006-01-02-15-04-05"
 )
 
 // Client represents the wrapper of S3 API Client
@@ -34,4 +40,14 @@ func (c *Client) UploadToS3(ctx context.Context, bucket, key string, reader io.R
 	}
 
 	return nil
+}
+
+// {prefix}/2006/01/02/2006-01-02-15-04-00.png
+func composeKey(prefix string, now time.Time, ext string) string {
+	key := filepath.Join(prefix, fmt.Sprintf("%04d/%02d/%02d", now.Year(), now.Month(), now.Day()), now.Format(timeFormat))
+	if ext != "" {
+		key += "." + ext
+	}
+
+	return key
 }

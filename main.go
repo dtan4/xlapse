@@ -7,17 +7,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
-)
-
-const (
-	timeFormat = "2006-01-02-15-04-00"
 )
 
 func HandleRequest(ctx context.Context) error {
@@ -54,11 +49,7 @@ func do(ctx context.Context, url, bucket, keyPrefix string) error {
 	s3Client := newS3Client(api)
 
 	now := time.Now()
-	// {keyPrefix}/2006/01/02/2006-01-02-15-04-00.png
-	key := filepath.Join(keyPrefix, fmt.Sprintf("%4d/%2d/%2d", now.Year(), now.Month(), now.Day()), time.Now().Format(timeFormat))
-	if ext != "" {
-		key += "." + ext
-	}
+	key := composeKey(keyPrefix, now, ext)
 
 	log.Printf("uploading to bucket: %s key: %s", bucket, key)
 
