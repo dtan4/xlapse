@@ -74,7 +74,7 @@ func TestDownload(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			body, ext, err := download(ctx, *ts.Client(), ts.URL)
+			body, ext, err := download(ctx, ts.Client(), ts.URL)
 			if tc.wantErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got %s", err)

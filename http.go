@@ -13,7 +13,7 @@ var extensions = map[string]string{
 	"image/gif":  "gif",
 }
 
-func download(ctx context.Context, client http.Client, url string) ([]byte, string, error) {
+func download(ctx context.Context, client *http.Client, url string) ([]byte, string, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return []byte{}, "", fmt.Errorf("cannot make HTTP request: %w", err)

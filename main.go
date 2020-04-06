@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-xray-sdk-go/xray"
 )
 
 const (
@@ -36,9 +37,9 @@ func main() {
 }
 
 func do(ctx context.Context, url, bucket, keyPrefix string) error {
-	httpClient := http.Client{
+	httpClient := xray.Client(&http.Client{
 		Timeout: 5 * time.Second,
-	}
+	})
 
 	log.Printf("downloading %s", url)
 
@@ -49,6 +50,7 @@ func do(ctx context.Context, url, bucket, keyPrefix string) error {
 
 	sess := session.New()
 	api := s3.New(sess)
+	xray.AWS(api.Client)
 	s3Client := newS3Client(api)
 
 	key := filepath.Join(keyPrefix, time.Now().Format(timeFormat))
