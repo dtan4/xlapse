@@ -7,7 +7,7 @@ LDFLAGS  := -ldflags="-s -w"
 export GO111MODULE=on
 
 build:
-	go build $(LDFLAGS) -o bin/$(NAME)
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o bin/$(NAME)
 
 test:
 	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
