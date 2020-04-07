@@ -7,6 +7,35 @@ Globals:
     Timeout: 5
 
 Resources:
+  RemoteFileToS3Distributor:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: bin
+      Handler: remote-file-to-s3-function-distributor
+      Runtime: go1.x
+      Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - "lambda:InvokeFunction"
+              Resource: !GetAtt RemoteFileToS3Downloader.Arn
+            - Effect: Allow
+              Action:
+                - "s3:GetObject"
+              Resource: "*"
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0/10 * * * ? *)
+      Environment:
+        Variables:
+          BUCKET: example-bucket
+          KEY: example.csv
+          DOWNLOADER_FUNCTION_ARN: !GetAtt RemoteFileToS3Downloader.Arn
+
   RemoteFileToS3Downloader:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
