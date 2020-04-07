@@ -51,14 +51,3 @@ Resources:
                 - "s3:PutObject"
                 - "s3:PutObjectAcl"
               Resource: "*"
-      Events:
-        ScheduledEvent:
-          Type: Schedule
-          Properties:
-            Schedule: cron(0/10 * * * ? *)
-      Environment:
-        Variables:
-          URL: https://example.com/foo.png
-          BUCKET: example-bucket
-          KEY_PREFIX: example-prefix
-          TIMEZONE: Asia/Tokyo
