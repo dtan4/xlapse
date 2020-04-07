@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
+
+	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
 const (
@@ -24,7 +26,7 @@ func newLambdaClient(api lambdaiface.LambdaAPI) *LambdaClient {
 	}
 }
 
-func (c *LambdaClient) InvokeDownloaderFuncs(ctx context.Context, es Entries, arn string) error {
+func (c *LambdaClient) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, arn string) error {
 	for _, e := range es {
 		payload, err := json.Marshal(e)
 		if err != nil {

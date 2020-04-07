@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ type Entry struct {
 
 type Entries []*Entry
 
-func decodeYAML(body []byte) (Entries, error) {
+func DecodeEntriesYAML(body []byte) (Entries, error) {
 	es := Entries{}
 
 	if err := yaml.Unmarshal(body, &es); err != nil {

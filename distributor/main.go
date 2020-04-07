@@ -11,6 +11,8 @@ import (
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-xray-sdk-go/xray"
+
+	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
 func HandleRequest(ctx context.Context) error {
@@ -40,7 +42,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 		return fmt.Errorf("cannot download file from S3 (bucket: %q, key: %q): %w", bucket, key, err)
 	}
 
-	es, err := decodeYAML(body)
+	es, err := types.DecodeEntriesYAML(body)
 	if err != nil {
 		return fmt.Errorf("cannot decode YAML: %w", err)
 	}

@@ -9,6 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
+
+	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
 var (
@@ -32,21 +34,21 @@ func (m *mockLambdaAPI) InvokeWithContext(ctx context.Context, input *lambda.Inv
 
 func TestInvokeDownloaderFuncs(t *testing.T) {
 	testcases := map[string]struct {
-		es        Entries
+		es        types.Entries
 		arn       string
 		want      [][]byte
 		invokeErr error
 		wantErr   error
 	}{
 		"success": {
-			es: Entries{
-				&Entry{
+			es: types.Entries{
+				&types.Entry{
 					URL:       "https://example.co.jp/foo.jpg",
 					Bucket:    "bucket",
 					KeyPrefix: "prefix",
 					Timezone:  "Asia/Tokyo",
 				},
-				&Entry{
+				&types.Entry{
 					URL:       "https://example.com.sg/bar.png",
 					Bucket:    "bucket-sg",
 					KeyPrefix: "prefix-sg",
@@ -62,14 +64,14 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 			wantErr:   nil,
 		},
 		"error": {
-			es: Entries{
-				&Entry{
+			es: types.Entries{
+				&types.Entry{
 					URL:       "https://example.co.jp/foo.jpg",
 					Bucket:    "bucket",
 					KeyPrefix: "prefix",
 					Timezone:  "Asia/Tokyo",
 				},
-				&Entry{
+				&types.Entry{
 					URL:       "https://example.com.sg/bar.png",
 					Bucket:    "bucket-sg",
 					KeyPrefix: "prefix-sg",
@@ -79,7 +81,7 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 			arn:       "foo",
 			want:      [][]byte{},
 			invokeErr: fmt.Errorf("cannot invoke function"),
-			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with entry main.Entry{URL:"https://example.co.jp/foo.jpg", Bucket:"bucket", KeyPrefix:"prefix", Timezone:"Asia/Tokyo"}: cannot invoke function`),
+			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with entry types.Entry{URL:"https://example.co.jp/foo.jpg", Bucket:"bucket", KeyPrefix:"prefix", Timezone:"Asia/Tokyo"}: cannot invoke function`),
 		},
 	}
 

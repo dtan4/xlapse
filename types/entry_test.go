@@ -1,11 +1,11 @@
-package main
+package types
 
 import (
 	"reflect"
 	"testing"
 )
 
-func TestDecodeYAML(t *testing.T) {
+func TestDecodeEntriesYAML(t *testing.T) {
 	testcases := map[string]struct {
 		body []byte
 		want Entries
@@ -39,7 +39,7 @@ func TestDecodeYAML(t *testing.T) {
 
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
-			got, err := decodeYAML(tc.body)
+			got, err := DecodeEntriesYAML(tc.body)
 			if err != nil {
 				t.Errorf("want no error, got %s", err)
 			}
