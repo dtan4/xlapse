@@ -7,10 +7,10 @@ import (
 )
 
 type Entry struct {
-	URL       string `yaml:"url"`
-	Bucket    string `yaml:"bucket"`
-	KeyPrefix string `yaml:"key_prefix"`
-	Timezone  string `yaml:"timezone"`
+	URL       string `yaml:"url" json:"url"`
+	Bucket    string `yaml:"bucket" json:"bucket"`
+	KeyPrefix string `yaml:"key_prefix" json:"key_prefix"`
+	Timezone  string `yaml:"timezone" json:"timezone"`
 }
 
 type Entries []*Entry

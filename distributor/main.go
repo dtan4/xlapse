@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
 func main() {
@@ -18,10 +19,10 @@ func main() {
 }
 
 func realMain(args []string) error {
-	if len(args) < 3 {
-		return fmt.Errorf("bucket and/or key is missing")
+	if len(args) < 4 {
+		return fmt.Errorf("bucket, key and/or function ARN is missing")
 	}
-	bucket, key := args[1], args[2]
+	bucket, key, farn := args[1], args[2], args[3]
 
 	log.Printf("bucket: %q", bucket)
 	log.Printf("key: %q", key)
@@ -29,8 +30,8 @@ func realMain(args []string) error {
 	ctx := context.Background()
 
 	sess := session.New()
-	api := s3.New(sess)
-	s3Client := newS3Client(api)
+	s3API := s3.New(sess)
+	s3Client := newS3Client(s3API)
 
 	body, err := s3Client.GetObject(ctx, bucket, key)
 	if err != nil {
@@ -44,6 +45,13 @@ func realMain(args []string) error {
 
 	for _, e := range es {
 		fmt.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.URL, e.Bucket, e.KeyPrefix, e.Timezone)
+	}
+
+	lambdaAPI := lambda.New(sess)
+	lambdaClient := newLambdaClient(lambdaAPI)
+
+	if err := lambdaClient.InvokeDownloaderFuncs(ctx, es, farn); err != nil {
+		return fmt.Errorf("cannot invoke download functions: %w", err)
 	}
 
 	return nil
