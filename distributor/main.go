@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-xray-sdk-go/xray"
 )
 
 func HandleRequest(ctx context.Context) error {
@@ -31,6 +32,7 @@ func main() {
 func do(ctx context.Context, bucket, key, farn string) error {
 	sess := session.New()
 	s3API := s3api.New(sess)
+	xray.AWS(s3API.Client)
 	s3Client := newS3Client(s3API)
 
 	body, err := s3Client.GetObject(ctx, bucket, key)
@@ -48,6 +50,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 	}
 
 	lambdaAPI := lambdaapi.New(sess)
+	xray.AWS(lambdaAPI.Client)
 	lambdaClient := newLambdaClient(lambdaAPI)
 
 	if err := lambdaClient.InvokeDownloaderFuncs(ctx, es, farn); err != nil {
