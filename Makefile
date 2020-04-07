@@ -8,7 +8,7 @@ export GO111MODULE=on
 
 build-distributor:
 	cd distributor; \
-	go build $(LDFLAGS) -o ../bin/$(NAME)-distributor
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-distributor
 
 build-downloader:
 	cd downloader; \

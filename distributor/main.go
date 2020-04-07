@@ -6,31 +6,31 @@ import (
 	"log"
 	"os"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/lambda"
+	s3api "github.com/aws/aws-sdk-go/service/s3"
+	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
 )
 
-func main() {
-	if err := realMain(os.Args); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-}
-
-func realMain(args []string) error {
-	if len(args) < 4 {
-		return fmt.Errorf("bucket, key and/or function ARN is missing")
-	}
-	bucket, key, farn := args[1], args[2], args[3]
+func HandleRequest(ctx context.Context) error {
+	bucket := os.Getenv("BUCKET")
+	key := os.Getenv("KEY")
+	farn := os.Getenv("DOWNLOADER_FUNCTION_ARN")
 
 	log.Printf("bucket: %q", bucket)
 	log.Printf("key: %q", key)
+	log.Printf("farn: %q", farn)
 
-	ctx := context.Background()
+	return do(ctx, bucket, key, farn)
+}
 
+func main() {
+	lambda.Start(HandleRequest)
+}
+
+func do(ctx context.Context, bucket, key, farn string) error {
 	sess := session.New()
-	s3API := s3.New(sess)
+	s3API := s3api.New(sess)
 	s3Client := newS3Client(s3API)
 
 	body, err := s3Client.GetObject(ctx, bucket, key)
@@ -47,7 +47,7 @@ func realMain(args []string) error {
 		fmt.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.URL, e.Bucket, e.KeyPrefix, e.Timezone)
 	}
 
-	lambdaAPI := lambda.New(sess)
+	lambdaAPI := lambdaapi.New(sess)
 	lambdaClient := newLambdaClient(lambdaAPI)
 
 	if err := lambdaClient.InvokeDownloaderFuncs(ctx, es, farn); err != nil {
