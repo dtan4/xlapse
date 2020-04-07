@@ -2,9 +2,11 @@ NAME := remote-file-to-s3-function
 
 LDFLAGS  := -ldflags="-s -w"
 
-.DEFAULT_GOAL := build-distributor build-downloader
+.DEFAULT_GOAL := build
 
 export GO111MODULE=on
+
+build: build-distributor build-downloader
 
 build-distributor:
 	cd distributor; \

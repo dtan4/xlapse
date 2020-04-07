@@ -6,35 +6,34 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
+
+	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
 const (
 	defaultTimezone = "UTC"
 )
 
-func HandleRequest(ctx context.Context) error {
-	url := os.Getenv("URL")
-	bucket := os.Getenv("BUCKET")
-	keyPrefix := os.Getenv("KEY_PREFIX")
+func HandleRequest(ctx context.Context, entry types.Entry) error {
+	log.Printf("entry: %#v", entry)
 
-	timezone := os.Getenv("TIMEZONE")
+	timezone := entry.Timezone
 	if timezone == "" {
 		timezone = defaultTimezone
 	}
 
-	log.Printf("url: %q", url)
-	log.Printf("bucket: %q", bucket)
-	log.Printf("key prefix: %q", keyPrefix)
+	log.Printf("url: %q", entry.URL)
+	log.Printf("bucket: %q", entry.Bucket)
+	log.Printf("key prefix: %q", entry.KeyPrefix)
 	log.Printf("timezone: %q", timezone)
 
-	return do(ctx, url, bucket, keyPrefix, timezone)
+	return do(ctx, entry.URL, entry.Bucket, entry.KeyPrefix, timezone)
 }
 
 func main() {
