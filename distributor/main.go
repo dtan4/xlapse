@@ -37,7 +37,14 @@ func realMain(args []string) error {
 		return fmt.Errorf("cannot download file from S3 (bucket: %q, key: %q): %w", bucket, key, err)
 	}
 
-	fmt.Println(string(body))
+	es, err := decodeYAML(body)
+	if err != nil {
+		return fmt.Errorf("cannot decode YAML: %w", err)
+	}
+
+	for _, e := range es {
+		fmt.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.URL, e.Bucket, e.KeyPrefix, e.Timezone)
+	}
 
 	return nil
 }
