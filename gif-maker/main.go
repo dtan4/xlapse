@@ -5,11 +5,17 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/dtan4/remote-file-to-s3-function/types"
+)
+
+const (
+	defaultDelay   = 10 // 100ms per frame == 10fps
+	defaultGifName = "out.gif"
 )
 
 func main() {
@@ -61,10 +67,12 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 	log.Printf("month: %d", req.Month)
 	log.Printf("day: %d", req.Day)
 
-	return do(ctx, req.Bucket, req.KeyPrefix, req.Year, req.Month, req.Day)
+	delay := defaultDelay
+
+	return do(ctx, req.Bucket, req.KeyPrefix, req.Year, req.Month, req.Day, delay)
 }
 
-func do(ctx context.Context, bucket, keyPrefix string, year, month, day int) error {
+func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay int) error {
 	sess := session.New()
 	api := s3.New(sess)
 	s3Client := newS3Client(api)
@@ -78,8 +86,31 @@ func do(ctx context.Context, bucket, keyPrefix string, year, month, day int) err
 		return fmt.Errorf("cannot retrieve object list from S3: %w", err)
 	}
 
+	if len(keys) == 0 {
+		return fmt.Errorf("no files found in bucket: %q folder: %q", bucket, folder)
+	}
+
+	sort.Strings(keys)
+
+	g := NewGif()
+
 	for _, k := range keys {
-		log.Println(k)
+		log.Printf("appending image %q to animated GIF", k)
+
+		body, err := s3Client.GetObject(ctx, bucket, k)
+		if err != nil {
+			return fmt.Errorf("cannot download object from S3: %q", err)
+		}
+
+		if err := g.Append(body, delay); err != nil {
+			return fmt.Errorf("cannot append image %q to animated GIF: %w", k, err)
+		}
+	}
+
+	log.Printf("saving animated GIF to %q", defaultGifName)
+
+	if g.SaveToFile(defaultGifName); err != nil {
+		return fmt.Errorf("cannot save GIF image to %q: %w", defaultGifName, err)
 	}
 
 	return nil

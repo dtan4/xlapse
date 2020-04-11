@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"path/filepath"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -45,6 +46,25 @@ func (c *Client) ListObjectKeys(ctx context.Context, bucket, folder string) ([]s
 	}
 
 	return keys, nil
+}
+
+// GetObject downloads the given object itself from the given S3 bucket
+func (c *Client) GetObject(ctx context.Context, bucket, key string) ([]byte, error) {
+	out, err := c.api.GetObjectWithContext(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return []byte{}, fmt.Errorf("cannot download S3 object from bucket: %q, key: %q: %w", bucket, key, err)
+	}
+	defer out.Body.Close()
+
+	body, err := ioutil.ReadAll(out.Body)
+	if err != nil {
+		return []byte{}, fmt.Errorf("cannot read S3 object from bucket: %q, key: %q: %w", bucket, key, err)
+	}
+
+	return body, nil
 }
 
 // {prefix}/2006/01/02/
