@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 
@@ -15,7 +16,7 @@ import (
 
 const (
 	defaultDelay   = 10 // 100ms per frame == 10fps
-	defaultGifName = "out.gif"
+	defaultGifName = "movie.gif"
 )
 
 func main() {
@@ -95,6 +96,11 @@ func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay i
 	g := NewGif()
 
 	for _, k := range keys {
+		if filepath.Base(k) == defaultGifName {
+			log.Printf("skip %q", k)
+			continue
+		}
+
 		log.Printf("appending image %q to animated GIF", k)
 
 		body, err := s3Client.GetObject(ctx, bucket, k)
@@ -111,6 +117,17 @@ func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay i
 
 	if g.SaveToFile(defaultGifName); err != nil {
 		return fmt.Errorf("cannot save GIF image to %q: %w", defaultGifName, err)
+	}
+
+	f, err := os.Open(defaultGifName)
+	if err != nil {
+		return fmt.Errorf("cannot open %q", defaultGifName)
+	}
+	defer f.Close()
+
+	outKey := filepath.Join(folder, defaultGifName)
+	if err := s3Client.Upload(ctx, bucket, outKey, f); err != nil {
+		return fmt.Errorf("cannot upload animated GIF to S3 bucket: %q key: %q, %w", bucket, outKey, err)
 	}
 
 	return nil

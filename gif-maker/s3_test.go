@@ -51,6 +51,14 @@ func (m *mockS3API) GetObjectWithContext(ctx context.Context, input *s3.GetObjec
 	}, nil
 }
 
+func (m *mockS3API) PutObjectWithContext(ctx context.Context, input *s3.PutObjectInput, opts ...request.Option) (*s3.PutObjectOutput, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+
+	return nil, nil
+}
+
 func TestListObjectKeys(t *testing.T) {
 	testcases := map[string]struct {
 		bucket    string
@@ -169,6 +177,58 @@ func TestGetObject(t *testing.T) {
 
 				if bytes.Compare(got, tc.want) != 0 {
 					t.Errorf("want %q, got %q", string(tc.want), string(got))
+				}
+			} else {
+				if err == nil {
+					t.Errorf("want error: %q, got nil", tc.expectErr.Error())
+				}
+
+				if err.Error() != tc.expectErr.Error() {
+					t.Errorf("want error: %q, got: %q", tc.expectErr.Error(), err.Error())
+				}
+			}
+		})
+	}
+}
+
+func TestUpload(t *testing.T) {
+	testcases := map[string]struct {
+		bucket    string
+		key       string
+		body      string
+		uploadErr error
+		expectErr error
+	}{
+		"success": {
+			bucket:    "test",
+			key:       "test.jpg",
+			body:      "foo",
+			uploadErr: nil,
+			expectErr: nil,
+		},
+		"error": {
+			bucket:    "test",
+			key:       "test.jpg",
+			body:      "foo",
+			uploadErr: fmt.Errorf("cannot upload"),
+			expectErr: fmt.Errorf("cannot upload file to S3: cannot upload"),
+		},
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			reader := bytes.NewReader([]byte(tc.body))
+
+			s3Client := &Client{api: &mockS3API{
+				err: tc.uploadErr,
+			}}
+
+			err := s3Client.Upload(ctx, tc.bucket, tc.key, reader)
+			if tc.expectErr == nil {
+				if err != nil {
+					t.Errorf("want no error, got: %q", err.Error())
 				}
 			} else {
 				if err == nil {

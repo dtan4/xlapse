@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"path/filepath"
 
@@ -65,6 +66,20 @@ func (c *Client) GetObject(ctx context.Context, bucket, key string) ([]byte, err
 	}
 
 	return body, nil
+}
+
+// Upload uploads the given stream to the given S3 location
+func (c *Client) Upload(ctx context.Context, bucket, key string, reader io.ReadSeeker) error {
+	_, err := c.api.PutObjectWithContext(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+		Body:   reader,
+	})
+	if err != nil {
+		return fmt.Errorf("cannot upload file to S3: %w", err)
+	}
+
+	return nil
 }
 
 // {prefix}/2006/01/02/
