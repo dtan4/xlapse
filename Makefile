@@ -18,7 +18,7 @@ build-downloader:
 
 build-gif-maker:
 	cd gif-maker; \
-	go build $(LDFLAGS) -o ../bin/$(NAME)-gif-maker
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-gif-maker
 
 test:
 	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...

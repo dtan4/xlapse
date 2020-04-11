@@ -5,13 +5,13 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
@@ -21,45 +21,7 @@ const (
 )
 
 func main() {
-	if err := realMain(os.Args); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-}
-
-func realMain(args []string) error {
-	if len(args) < 6 {
-		return fmt.Errorf("./gif-maker <bucket> <keyPrefix> <year> <month> <day>")
-	}
-
-	bucket, keyPrefix := args[1], args[2]
-
-	year, err := strconv.Atoi(args[3])
-	if err != nil {
-		return fmt.Errorf("year is not integer")
-	}
-
-	month, err := strconv.Atoi(args[4])
-	if err != nil {
-		return fmt.Errorf("month is not integer")
-	}
-
-	day, err := strconv.Atoi(args[5])
-	if err != nil {
-		return fmt.Errorf("day is not integer")
-	}
-
-	ctx := context.Background()
-
-	req := types.GifRequest{
-		Bucket:    bucket,
-		KeyPrefix: keyPrefix,
-		Year:      year,
-		Month:     month,
-		Day:       day,
-	}
-
-	return HandleRequest(ctx, req)
+	lambda.Start(HandleRequest)
 }
 
 func HandleRequest(ctx context.Context, req types.GifRequest) error {
@@ -77,6 +39,7 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay int) error {
 	sess := session.New()
 	api := s3.New(sess)
+	xray.AWS(api.Client)
 	s3Client := newS3Client(api)
 
 	folder := composeFolder(keyPrefix, year, month, day)
