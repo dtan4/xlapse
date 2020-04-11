@@ -51,3 +51,21 @@ Resources:
                 - "s3:PutObject"
                 - "s3:PutObjectAcl"
               Resource: "*"
+
+  RemoteFileToS3GifMaker:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: bin
+      Handler: remote-file-to-s3-gif-maker
+      Runtime: go1.x
+      Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - "s3:ListBucket"
+                - "s3:GetObject"
+                - "s3:PutObject"
+                - "s3:PutObjectAcl"
+              Resource: "*"
