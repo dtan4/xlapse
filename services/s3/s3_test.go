@@ -107,12 +107,12 @@ func TestListObjectKeys(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			s3Client := &Client{api: &mockS3API{
+			client := &Client{api: &mockS3API{
 				keys: tc.keys,
 				err:  tc.listErr,
 			}}
 
-			got, err := s3Client.ListObjectKeys(ctx, tc.bucket, tc.folder)
+			got, err := client.ListObjectKeys(ctx, tc.bucket, tc.folder)
 			if tc.expectErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got %q", err.Error())
@@ -165,12 +165,12 @@ func TestGetObject(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			s3Client := &Client{api: &mockS3API{
+			client := &Client{api: &mockS3API{
 				body: []byte(tc.body),
 				err:  tc.getErr,
 			}}
 
-			got, err := s3Client.GetObject(ctx, tc.bucket, tc.key)
+			got, err := client.GetObject(ctx, tc.bucket, tc.key)
 			if tc.expectErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got: %q", err.Error())
@@ -222,11 +222,11 @@ func TestUpload(t *testing.T) {
 
 			reader := bytes.NewReader([]byte(tc.body))
 
-			s3Client := &Client{api: &mockS3API{
+			client := &Client{api: &mockS3API{
 				err: tc.uploadErr,
 			}}
 
-			err := s3Client.Upload(ctx, tc.bucket, tc.key, reader)
+			err := client.Upload(ctx, tc.bucket, tc.key, reader)
 			if tc.expectErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got: %q", err.Error())

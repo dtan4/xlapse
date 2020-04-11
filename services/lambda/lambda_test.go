@@ -89,11 +89,11 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			lambdaClient := &Client{api: &mockLambdaAPI{
+			client := &Client{api: &mockLambdaAPI{
 				err: tc.invokeErr,
 			}}
 
-			err := lambdaClient.InvokeDownloaderFuncs(ctx, tc.es, tc.arn)
+			err := client.InvokeDownloaderFuncs(ctx, tc.es, tc.arn)
 			if tc.wantErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got %q", err)
@@ -161,11 +161,11 @@ func TestInvokeGifMakerFuncs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			lambdaClient := &Client{api: &mockLambdaAPI{
+			client := &Client{api: &mockLambdaAPI{
 				err: tc.invokeErr,
 			}}
 
-			err := lambdaClient.InvokeGifMakerFuncs(ctx, tc.req, tc.arn)
+			err := client.InvokeGifMakerFuncs(ctx, tc.req, tc.arn)
 			if tc.wantErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got %q", err)
