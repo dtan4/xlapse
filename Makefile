@@ -6,7 +6,7 @@ LDFLAGS  := -ldflags="-s -w"
 
 export GO111MODULE=on
 
-build: build-distributor build-downloader build-animated-gif-maker
+build: build-distributor build-downloader build-gif-maker
 
 build-distributor:
 	cd distributor; \
