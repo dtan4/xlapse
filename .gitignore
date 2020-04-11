@@ -28,6 +28,7 @@
 /*.jpeg
 /*.jpg
 /*.png
+/*.gif
 /bin
 /coverage.txt
 /package.yaml
