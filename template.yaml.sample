@@ -52,6 +52,35 @@ Resources:
                 - "s3:PutObjectAcl"
               Resource: "*"
 
+  RemoteFileToS3GifDistributor:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: bin
+      Handler: remote-file-to-s3-function-gif-distributor
+      Runtime: go1.x
+      Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - "lambda:InvokeFunction"
+              Resource: !GetAtt RemoteFileToS3GifMaker.Arn
+            - Effect: Allow
+              Action:
+                - "s3:GetObject"
+              Resource: "*"
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0/10 * * * ? *)
+      Environment:
+        Variables:
+          BUCKET: example-bucket
+          KEY: example.csv
+          GIF_MAKER_FUNCTION_ARN: !GetAtt RemoteFileToS3GifMaker.Arn
+
   RemoteFileToS3GifMaker:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
