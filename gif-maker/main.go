@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
@@ -63,6 +65,22 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 }
 
 func do(ctx context.Context, bucket, keyPrefix string, year, month, day int) error {
+	sess := session.New()
+	api := s3.New(sess)
+	s3Client := newS3Client(api)
+
+	folder := composeFolder(keyPrefix, year, month, day)
+
+	log.Printf("retrieving object list in bucket: %q folder: %q", bucket, folder)
+
+	keys, err := s3Client.ListObjectKeys(ctx, bucket, folder)
+	if err != nil {
+		return fmt.Errorf("cannot retrieve object list from S3: %w", err)
+	}
+
+	for _, k := range keys {
+		log.Println(k)
+	}
 
 	return nil
 }
