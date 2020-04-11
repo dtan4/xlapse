@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/dtan4/remote-file-to-s3-function/types"
@@ -47,6 +48,9 @@ func do(ctx context.Context, bucket, key, farn string) error {
 		return fmt.Errorf("cannot decode YAML: %w", err)
 	}
 
+	lambdaAPI := lambdaapi.New(sess)
+	lambdaClient := newLambdaClient(lambdaAPI)
+
 	now := time.Now()
 
 	for _, e := range es {
@@ -57,9 +61,19 @@ func do(ctx context.Context, bucket, key, farn string) error {
 			return fmt.Errorf("cannot load timezone %q: %w", e.Timezone, err)
 		}
 
-		yesterday := now.In(loc).Add(-24 * time.Hour)
+		yday := now.In(loc).Add(-24 * time.Hour)
 
-		log.Printf("yesterday: %s", yesterday.Format("2006-01-02"))
+		req := types.GifRequest{
+			Bucket:    e.Bucket,
+			KeyPrefix: e.KeyPrefix,
+			Year:      yday.Year(),
+			Month:     int(yday.Month()),
+			Day:       yday.Day(),
+		}
+
+		if err := lambdaClient.InvokeGifMakerFuncs(ctx, req, farn); err != nil {
+			return fmt.Errorf("cannot invoke gif-maker function: %w", err)
+		}
 	}
 
 	return nil
