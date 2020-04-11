@@ -6,7 +6,7 @@ LDFLAGS  := -ldflags="-s -w"
 
 export GO111MODULE=on
 
-build: build-distributor build-downloader build-gif-maker
+build: build-distributor build-downloader build-gif-distributor abuild-gif-maker
 
 build-distributor:
 	cd distributor; \
@@ -15,6 +15,10 @@ build-distributor:
 build-downloader:
 	cd downloader; \
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-downloader
+
+build-gif-distributor:
+	cd gif-distributor; \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-gif-distributor
 
 build-gif-maker:
 	cd gif-maker; \
