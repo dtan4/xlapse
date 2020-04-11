@@ -85,12 +85,16 @@ func (c *Client) Upload(ctx context.Context, bucket, key string, reader io.ReadS
 
 // {prefix}/2006/01/02/
 func ComposeFolder(prefix string, year, month, day int) string {
+	return composeFolder(prefix, year, month, day)
+}
+
+func composeFolder(prefix string, year, month, day int) string {
 	return filepath.Join(prefix, fmt.Sprintf("%04d/%02d/%02d", year, month, day)) + "/"
 }
 
 // {prefix}/2006/01/02/2006-01-02-15-04-00.png
 func ComposeKey(prefix string, now time.Time, ext string) string {
-	key := filepath.Join(prefix, fmt.Sprintf("%04d/%02d/%02d", now.Year(), now.Month(), now.Day()), now.Format(timeFormat))
+	key := filepath.Join(composeFolder(prefix, now.Year(), int(now.Month()), now.Day()), now.Format(timeFormat))
 	if ext != "" {
 		key += "." + ext
 	}
