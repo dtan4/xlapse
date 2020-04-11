@@ -64,6 +64,8 @@ func do(ctx context.Context, bucket, key, farn string) error {
 
 		yday := now.In(loc).Add(-24 * time.Hour)
 
+		log.Printf("yesterday: %q", yday.String())
+
 		req := types.GifRequest{
 			Bucket:    e.Bucket,
 			KeyPrefix: e.KeyPrefix,
@@ -71,6 +73,8 @@ func do(ctx context.Context, bucket, key, farn string) error {
 			Month:     int(yday.Month()),
 			Day:       yday.Day(),
 		}
+
+		log.Printf("invoking gif-maker function for bucket %q key %q", e.Bucket, e.KeyPrefix)
 
 		if err := lambdaClient.InvokeGifMakerFuncs(ctx, req, farn); err != nil {
 			return fmt.Errorf("cannot invoke gif-maker function: %w", err)
