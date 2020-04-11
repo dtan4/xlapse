@@ -58,6 +58,8 @@ Resources:
       CodeUri: bin
       Handler: remote-file-to-s3-function-gif-maker
       Runtime: go1.x
+      MemorySize: 1024 # MB
+      Timeout: 180 # seconds
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
       Policies:
         - Version: '2012-10-17'
