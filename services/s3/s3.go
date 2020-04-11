@@ -1,4 +1,4 @@
-package main
+package s3
 
 import (
 	"context"
@@ -15,19 +15,19 @@ const (
 )
 
 // Client represents the wrapper of S3 API Client
-type S3Client struct {
+type Client struct {
 	api s3iface.S3API
 }
 
 // New creates new Client
-func newS3Client(api s3iface.S3API) *S3Client {
-	return &S3Client{
+func New(api s3iface.S3API) *Client {
+	return &Client{
 		api: api,
 	}
 }
 
 // UploadToS3 uploads local file to the specified S3 location
-func (c *S3Client) GetObject(ctx context.Context, bucket, key string) ([]byte, error) {
+func (c *Client) GetObject(ctx context.Context, bucket, key string) ([]byte, error) {
 	out, err := c.api.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),

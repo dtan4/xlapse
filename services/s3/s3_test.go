@@ -1,4 +1,4 @@
-package main
+package s3
 
 import (
 	"bytes"
@@ -59,7 +59,7 @@ func TestGetObject(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			s3Client := &S3Client{api: &mockS3API{
+			s3Client := &Client{api: &mockS3API{
 				body: []byte(tc.body),
 				err:  tc.getErr,
 			}}
