@@ -7,9 +7,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-xray-sdk-go/xray"
 
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
@@ -17,7 +19,7 @@ import (
 func HandleRequest(ctx context.Context) error {
 	bucket := os.Getenv("BUCKET")
 	key := os.Getenv("KEY")
-	farn := os.Getenv("DOWNLOADER_FUNCTION_ARN")
+	farn := os.Getenv("GIF_MAKER_FUNCTION_ARN")
 
 	log.Printf("bucket: %q", bucket)
 	log.Printf("key: %q", key)
@@ -27,15 +29,13 @@ func HandleRequest(ctx context.Context) error {
 }
 
 func main() {
-	if err := HandleRequest(context.Background()); err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
+	lambda.Start(HandleRequest)
 }
 
 func do(ctx context.Context, bucket, key, farn string) error {
 	sess := session.New()
 	s3API := s3api.New(sess)
+	xray.AWS(s3API.Client)
 	s3Client := newS3Client(s3API)
 
 	body, err := s3Client.GetObject(ctx, bucket, key)
@@ -49,6 +49,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 	}
 
 	lambdaAPI := lambdaapi.New(sess)
+	xray.AWS(lambdaAPI.Client)
 	lambdaClient := newLambdaClient(lambdaAPI)
 
 	now := time.Now()

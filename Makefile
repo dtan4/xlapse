@@ -18,7 +18,7 @@ build-downloader:
 
 build-gif-distributor:
 	cd gif-distributor; \
-	go build $(LDFLAGS) -o ../bin/$(NAME)-gif-distributor
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-gif-distributor
 
 build-gif-maker:
 	cd gif-maker; \
