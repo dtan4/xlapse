@@ -7,7 +7,7 @@ import (
 	"image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-	"os"
+	"io"
 )
 
 type Gif struct {
@@ -43,15 +43,9 @@ func (g *Gif) Append(body []byte, delay int) error {
 	return nil
 }
 
-func (g *Gif) SaveToFile(name string) error {
-	f, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return fmt.Errorf("cannot open %q: %w", name, err)
-	}
-	defer f.Close()
-
-	if err := gif.EncodeAll(f, g.gif); err != nil {
-		return fmt.Errorf("cannot write GIF image to %q: %w", name, err)
+func (g *Gif) Save(w io.Writer) error {
+	if err := gif.EncodeAll(w, g.gif); err != nil {
+		return fmt.Errorf("cannot write GIF image: %w", err)
 	}
 
 	return nil

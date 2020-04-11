@@ -40,7 +40,7 @@ func TestAppend(t *testing.T) {
 	}
 }
 
-func TestSaveToFile(t *testing.T) {
+func TestSave(t *testing.T) {
 	testcases := map[string]struct {
 		source string
 	}{
@@ -77,8 +77,13 @@ func TestSaveToFile(t *testing.T) {
 			defer os.RemoveAll(tmpdir)
 
 			out := filepath.Join(tmpdir, "TestSaveToFile.gif")
+			fout, err := os.OpenFile(out, os.O_CREATE|os.O_WRONLY, 0600)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer fout.Close()
 
-			if err := g.SaveToFile(out); err != nil {
+			if err := g.Save(fout); err != nil {
 				t.Errorf("want no error, got %q", err.Error())
 			}
 

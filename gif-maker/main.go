@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -115,18 +116,14 @@ func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay i
 
 	log.Printf("saving animated GIF to %q", defaultGifName)
 
-	if g.SaveToFile(defaultGifName); err != nil {
+	var b bytes.Buffer
+
+	if g.Save(&b); err != nil {
 		return fmt.Errorf("cannot save GIF image to %q: %w", defaultGifName, err)
 	}
 
-	f, err := os.Open(defaultGifName)
-	if err != nil {
-		return fmt.Errorf("cannot open %q", defaultGifName)
-	}
-	defer f.Close()
-
 	outKey := filepath.Join(folder, defaultGifName)
-	if err := s3Client.Upload(ctx, bucket, outKey, f); err != nil {
+	if err := s3Client.Upload(ctx, bucket, outKey, bytes.NewReader(b.Bytes())); err != nil {
 		return fmt.Errorf("cannot upload animated GIF to S3 bucket: %q key: %q, %w", bucket, outKey, err)
 	}
 
