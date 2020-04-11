@@ -34,7 +34,7 @@ func (c *Client) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, ar
 
 		_, err = c.api.InvokeWithContext(ctx, &lambda.InvokeInput{
 			FunctionName:   aws.String(arn),
-			InvocationType: aws.String("Event"),
+			InvocationType: aws.String(invocationType),
 			Payload:        payload,
 		})
 		if err != nil {
@@ -53,7 +53,7 @@ func (c *Client) InvokeGifMakerFuncs(ctx context.Context, req types.GifRequest, 
 
 	_, err = c.api.InvokeWithContext(ctx, &lambda.InvokeInput{
 		FunctionName:   aws.String(arn),
-		InvocationType: aws.String("Event"),
+		InvocationType: aws.String(invocationType),
 		Payload:        payload,
 	})
 	if err != nil {
