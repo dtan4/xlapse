@@ -1,4 +1,4 @@
-package main
+package lambda
 
 import (
 	"context"
@@ -74,7 +74,7 @@ func TestInvokeGifMakerFuncs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			lambdaClient := &LambdaClient{api: &mockLambdaAPI{
+			lambdaClient := &Client{api: &mockLambdaAPI{
 				err: tc.invokeErr,
 			}}
 

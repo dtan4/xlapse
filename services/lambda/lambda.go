@@ -1,4 +1,4 @@
-package main
+package lambda
 
 import (
 	"context"
@@ -15,17 +15,17 @@ const (
 	invocationType = "Event" // Event - Invoke the function asynchronously.
 )
 
-type LambdaClient struct {
+type Client struct {
 	api lambdaiface.LambdaAPI
 }
 
-func newLambdaClient(api lambdaiface.LambdaAPI) *LambdaClient {
-	return &LambdaClient{
+func New(api lambdaiface.LambdaAPI) *Client {
+	return &Client{
 		api: api,
 	}
 }
 
-func (c *LambdaClient) InvokeGifMakerFuncs(ctx context.Context, req types.GifRequest, arn string) error {
+func (c *Client) InvokeGifMakerFuncs(ctx context.Context, req types.GifRequest, arn string) error {
 	payload, err := json.Marshal(req)
 	if err != nil {
 		return fmt.Errorf("cannot decode entry %#v to JSON: %w", req, err)
