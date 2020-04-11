@@ -74,7 +74,7 @@ Resources:
         ScheduledEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(0/10 * * * ? *)
+            Schedule: cron(15 3 * * ? *) # 12:15 pm JST every day
       Environment:
         Variables:
           BUCKET: example-bucket
