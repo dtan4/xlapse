@@ -6,12 +6,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/aws/aws-lambda-go/lambda"
+	baselambda "github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
 
+	"github.com/dtan4/remote-file-to-s3-function/services/lambda"
 	"github.com/dtan4/remote-file-to-s3-function/services/s3"
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
@@ -29,7 +30,7 @@ func HandleRequest(ctx context.Context) error {
 }
 
 func main() {
-	lambda.Start(HandleRequest)
+	baselambda.Start(HandleRequest)
 }
 
 func do(ctx context.Context, bucket, key, farn string) error {
@@ -54,7 +55,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 
 	lambdaAPI := lambdaapi.New(sess)
 	xray.AWS(lambdaAPI.Client)
-	lambdaClient := newLambdaClient(lambdaAPI)
+	lambdaClient := lambda.New(lambdaAPI)
 
 	if err := lambdaClient.InvokeDownloaderFuncs(ctx, es, farn); err != nil {
 		return fmt.Errorf("cannot invoke download functions: %w", err)

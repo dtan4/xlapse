@@ -25,6 +25,26 @@ func New(api lambdaiface.LambdaAPI) *Client {
 	}
 }
 
+func (c *Client) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, arn string) error {
+	for _, e := range es {
+		payload, err := json.Marshal(e)
+		if err != nil {
+			return fmt.Errorf("cannot decode entry %#v to JSON: %w", *e, err)
+		}
+
+		_, err = c.api.InvokeWithContext(ctx, &lambda.InvokeInput{
+			FunctionName:   aws.String(arn),
+			InvocationType: aws.String("Event"),
+			Payload:        payload,
+		})
+		if err != nil {
+			return fmt.Errorf("cannot invoke lambda function %q with entry %#v: %w", arn, *e, err)
+		}
+	}
+
+	return nil
+}
+
 func (c *Client) InvokeGifMakerFuncs(ctx context.Context, req types.GifRequest, arn string) error {
 	payload, err := json.Marshal(req)
 	if err != nil {
