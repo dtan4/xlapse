@@ -13,7 +13,7 @@ import (
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
 
-	"github.com/dtan4/remote-file-to-s3-function/services/s3"
+	"github.com/dtan4/remote-file-to-s3-function/service/s3"
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
