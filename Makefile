@@ -9,20 +9,20 @@ export GO111MODULE=on
 build: build-distributor build-downloader build-gif-distributor abuild-gif-maker
 
 build-distributor:
-	cd distributor; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-distributor
+	cd function/distributor; \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-distributor
 
 build-downloader:
-	cd downloader; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-downloader
+	cd function/downloader; \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-downloader
 
 build-gif-distributor:
-	cd gif-distributor; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-gif-distributor
+	cd function/gif-distributor; \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-gif-distributor
 
 build-gif-maker:
-	cd gif-maker; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../bin/$(NAME)-gif-maker
+	cd function/gif-maker; \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-gif-maker
 
 test:
 	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
