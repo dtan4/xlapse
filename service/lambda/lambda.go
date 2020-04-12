@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
 
-	"github.com/dtan4/remote-file-to-s3-function/types"
+	"github.com/dtan4/xlapse/types"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/dtan4/remote-file-to-s3-function
+module github.com/dtan4/xlapse
 
 go 1.14
 

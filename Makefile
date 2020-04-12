@@ -1,4 +1,4 @@
-NAME := remote-file-to-s3-function
+NAME := xlapse
 
 LDFLAGS  := -ldflags="-s -w"
 

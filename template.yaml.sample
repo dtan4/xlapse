@@ -11,7 +11,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: bin
-      Handler: remote-file-to-s3-function-distributor
+      Handler: xlapse-distributor
       Runtime: go1.x
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
       Policies:
@@ -40,7 +40,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: bin
-      Handler: remote-file-to-s3-function-downloader
+      Handler: xlapse-downloader
       Runtime: go1.x
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
       Policies:
@@ -56,7 +56,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: bin
-      Handler: remote-file-to-s3-function-gif-distributor
+      Handler: xlapse-gif-distributor
       Runtime: go1.x
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
       Policies:
@@ -85,7 +85,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: bin
-      Handler: remote-file-to-s3-function-gif-maker
+      Handler: xlapse-gif-maker
       Runtime: go1.x
       MemorySize: 1024 # MB
       Timeout: 180 # seconds
