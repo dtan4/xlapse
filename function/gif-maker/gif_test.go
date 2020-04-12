@@ -22,7 +22,7 @@ func TestAppend(t *testing.T) {
 
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
-			filename := filepath.Join("..", "testdata", tc.name)
+			filename := filepath.Join("..", "..", "testdata", tc.name)
 			body, err := ioutil.ReadFile(filename)
 			if err != nil {
 				t.Fatal(err)
@@ -51,7 +51,7 @@ func TestSave(t *testing.T) {
 
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
-			filename := filepath.Join("..", "testdata", tc.source)
+			filename := filepath.Join("..", "..", "testdata", tc.source)
 
 			f, err := os.Open(filename)
 			if err != nil {
