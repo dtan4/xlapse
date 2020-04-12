@@ -1,3 +1,3 @@
-# remote-file-to-s3-function
+# xlapse
 
-![Test](https://github.com/dtan4/remote-file-to-s3-function/workflows/Test/badge.svg)
+![Test](https://github.com/dtan4/xlapse/workflows/Test/badge.svg)
