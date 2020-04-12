@@ -10,8 +10,10 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
+
+	"github.com/dtan4/remote-file-to-s3-function/service/s3"
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
@@ -38,11 +40,11 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 
 func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay int) error {
 	sess := session.New()
-	api := s3.New(sess)
+	api := s3api.New(sess)
 	xray.AWS(api.Client)
-	s3Client := newS3Client(api)
+	s3Client := s3.New(api)
 
-	folder := composeFolder(keyPrefix, year, month, day)
+	folder := s3.ComposeFolder(keyPrefix, year, month, day)
 
 	log.Printf("retrieving object list in bucket: %q folder: %q", bucket, folder)
 

@@ -7,12 +7,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/aws-lambda-go/lambda"
+	baselambda "github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
 
+	"github.com/dtan4/remote-file-to-s3-function/service/lambda"
+	"github.com/dtan4/remote-file-to-s3-function/service/s3"
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
@@ -29,14 +31,14 @@ func HandleRequest(ctx context.Context) error {
 }
 
 func main() {
-	lambda.Start(HandleRequest)
+	baselambda.Start(HandleRequest)
 }
 
 func do(ctx context.Context, bucket, key, farn string) error {
 	sess := session.New()
 	s3API := s3api.New(sess)
 	xray.AWS(s3API.Client)
-	s3Client := newS3Client(s3API)
+	s3Client := s3.New(s3API)
 
 	body, err := s3Client.GetObject(ctx, bucket, key)
 	if err != nil {
@@ -50,7 +52,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 
 	lambdaAPI := lambdaapi.New(sess)
 	xray.AWS(lambdaAPI.Client)
-	lambdaClient := newLambdaClient(lambdaAPI)
+	lambdaClient := lambda.New(lambdaAPI)
 
 	now := time.Now()
 

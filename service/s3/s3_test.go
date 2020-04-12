@@ -1,4 +1,4 @@
-package main
+package s3
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -106,12 +107,12 @@ func TestListObjectKeys(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			s3Client := &Client{api: &mockS3API{
+			client := &Client{api: &mockS3API{
 				keys: tc.keys,
 				err:  tc.listErr,
 			}}
 
-			got, err := s3Client.ListObjectKeys(ctx, tc.bucket, tc.folder)
+			got, err := client.ListObjectKeys(ctx, tc.bucket, tc.folder)
 			if tc.expectErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got %q", err.Error())
@@ -164,12 +165,12 @@ func TestGetObject(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			s3Client := &Client{api: &mockS3API{
+			client := &Client{api: &mockS3API{
 				body: []byte(tc.body),
 				err:  tc.getErr,
 			}}
 
-			got, err := s3Client.GetObject(ctx, tc.bucket, tc.key)
+			got, err := client.GetObject(ctx, tc.bucket, tc.key)
 			if tc.expectErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got: %q", err.Error())
@@ -221,11 +222,11 @@ func TestUpload(t *testing.T) {
 
 			reader := bytes.NewReader([]byte(tc.body))
 
-			s3Client := &Client{api: &mockS3API{
+			client := &Client{api: &mockS3API{
 				err: tc.uploadErr,
 			}}
 
-			err := s3Client.Upload(ctx, tc.bucket, tc.key, reader)
+			err := client.Upload(ctx, tc.bucket, tc.key, reader)
 			if tc.expectErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got: %q", err.Error())
@@ -276,7 +277,61 @@ func TestComposeFolder(t *testing.T) {
 
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
-			got := composeFolder(tc.prefix, tc.year, tc.month, tc.day)
+			got := ComposeFolder(tc.prefix, tc.year, tc.month, tc.day)
+			if got != tc.want {
+				t.Errorf("want: %q, got: %q", tc.want, got)
+			}
+		})
+	}
+}
+
+func TestComposeKey(t *testing.T) {
+	jst, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		t.Fatalf("cannot retrieve Asia/Tokyo timezone: %s", err)
+	}
+
+	testcases := map[string]struct {
+		prefix string
+		now    time.Time
+		ext    string
+		want   string
+	}{
+		"no prefix but ext": {
+			prefix: "",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "png",
+			want:   "2020/04/06/2020-04-06-11-22-33.png",
+		},
+		"no prefix and no ext": {
+			prefix: "",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "",
+			want:   "2020/04/06/2020-04-06-11-22-33",
+		},
+		"prefix and ext": {
+			prefix: "awesome",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "png",
+			want:   "awesome/2020/04/06/2020-04-06-11-22-33.png",
+		},
+		"prefix but no ext": {
+			prefix: "awesome",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, time.UTC),
+			ext:    "",
+			want:   "awesome/2020/04/06/2020-04-06-11-22-33",
+		},
+		"JST": {
+			prefix: "awesome",
+			now:    time.Date(2020, 4, 6, 11, 22, 33, 0, jst),
+			ext:    "png",
+			want:   "awesome/2020/04/06/2020-04-06-11-22-33.png",
+		},
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			got := ComposeKey(tc.prefix, tc.now, tc.ext)
 			if got != tc.want {
 				t.Errorf("want: %q, got: %q", tc.want, got)
 			}

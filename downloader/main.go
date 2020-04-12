@@ -10,9 +10,10 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
 
+	"github.com/dtan4/remote-file-to-s3-function/service/s3"
 	"github.com/dtan4/remote-file-to-s3-function/types"
 )
 
@@ -58,16 +59,16 @@ func do(ctx context.Context, url, bucket, keyPrefix, timezone string) error {
 	}
 
 	sess := session.New()
-	api := s3.New(sess)
+	api := s3api.New(sess)
 	xray.AWS(api.Client)
-	s3Client := newS3Client(api)
+	s3Client := s3.New(api)
 
 	now := time.Now().In(loc)
-	key := composeKey(keyPrefix, now, ext)
+	key := s3.ComposeKey(keyPrefix, now, ext)
 
 	log.Printf("uploading to bucket: %s key: %s", bucket, key)
 
-	if err := s3Client.UploadToS3(ctx, bucket, key, bytes.NewReader(body)); err != nil {
+	if err := s3Client.Upload(ctx, bucket, key, bytes.NewReader(body)); err != nil {
 		return fmt.Errorf("cannot upload downloaded file to S3 (bucket: %q, key: %q): %w", bucket, key, err)
 	}
 

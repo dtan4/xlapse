@@ -1,4 +1,4 @@
-package main
+package lambda
 
 import (
 	"context"
@@ -55,8 +55,8 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 					Timezone:  "Asia/Singapore",
 				},
 			},
-			arn:       "foo",
-			want:      [][]byte{
+			arn: "foo",
+			want: [][]byte{
 				[]byte(`{"url":"https://example.co.jp/foo.jpg","bucket":"bucket","key_prefix":"prefix","timezone":"Asia/Tokyo"}`),
 				[]byte(`{"url":"https://example.com.sg/bar.png","bucket":"bucket-sg","key_prefix":"prefix-sg","timezone":"Asia/Singapore"}`),
 			},
@@ -89,11 +89,83 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			lambdaClient := &LambdaClient{api: &mockLambdaAPI{
+			client := &Client{api: &mockLambdaAPI{
 				err: tc.invokeErr,
 			}}
 
-			err := lambdaClient.InvokeDownloaderFuncs(ctx, tc.es, tc.arn)
+			err := client.InvokeDownloaderFuncs(ctx, tc.es, tc.arn)
+			if tc.wantErr == nil {
+				if err != nil {
+					t.Errorf("want no error, got %q", err)
+				}
+
+				if !reflect.DeepEqual(gotPayloads, tc.want) {
+					t.Errorf("want %q, got %q", tc.want, gotPayloads)
+				}
+			} else {
+				if err == nil {
+					t.Errorf("want error %q, got nil", tc.wantErr)
+				}
+
+				if err.Error() != tc.wantErr.Error() {
+					t.Errorf("want error %q, got %q", tc.wantErr, err)
+				}
+			}
+
+			t.Cleanup(func() {
+				gotPayloads = [][]byte{}
+			})
+		})
+	}
+}
+
+func TestInvokeGifMakerFuncs(t *testing.T) {
+	testcases := map[string]struct {
+		req       types.GifRequest
+		arn       string
+		want      [][]byte
+		invokeErr error
+		wantErr   error
+	}{
+		"success": {
+			req: types.GifRequest{
+				Bucket:    "bucket",
+				KeyPrefix: "prefix",
+				Year:      2020,
+				Month:     4,
+				Day:       11,
+			},
+			arn: "foo",
+			want: [][]byte{
+				[]byte(`{"bucket":"bucket","key_prefix":"prefix","year":2020,"month":4,"day":11}`),
+			},
+			invokeErr: nil,
+			wantErr:   nil,
+		},
+		"error": {
+			req: types.GifRequest{
+				Bucket:    "bucket",
+				KeyPrefix: "prefix",
+				Year:      2020,
+				Month:     4,
+				Day:       11,
+			},
+			arn:       "foo",
+			want:      [][]byte{},
+			invokeErr: fmt.Errorf("cannot invoke function"),
+			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with request types.GifRequest{Bucket:"bucket", KeyPrefix:"prefix", Year:2020, Month:4, Day:11}: cannot invoke function`),
+		},
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			client := &Client{api: &mockLambdaAPI{
+				err: tc.invokeErr,
+			}}
+
+			err := client.InvokeGifMakerFuncs(ctx, tc.req, tc.arn)
 			if tc.wantErr == nil {
 				if err != nil {
 					t.Errorf("want no error, got %q", err)

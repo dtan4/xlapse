@@ -1,4 +1,4 @@
-package main
+package s3
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"path/filepath"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -22,7 +23,7 @@ type Client struct {
 }
 
 // New creates new Client
-func newS3Client(api s3iface.S3API) *Client {
+func New(api s3iface.S3API) *Client {
 	return &Client{
 		api: api,
 	}
@@ -49,7 +50,7 @@ func (c *Client) ListObjectKeys(ctx context.Context, bucket, folder string) ([]s
 	return keys, nil
 }
 
-// GetObject downloads the given object itself from the given S3 bucket
+// UploadToS3 uploads local file to the specified S3 location
 func (c *Client) GetObject(ctx context.Context, bucket, key string) ([]byte, error) {
 	out, err := c.api.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
@@ -83,6 +84,20 @@ func (c *Client) Upload(ctx context.Context, bucket, key string, reader io.ReadS
 }
 
 // {prefix}/2006/01/02/
+func ComposeFolder(prefix string, year, month, day int) string {
+	return composeFolder(prefix, year, month, day)
+}
+
 func composeFolder(prefix string, year, month, day int) string {
 	return filepath.Join(prefix, fmt.Sprintf("%04d/%02d/%02d", year, month, day)) + "/"
+}
+
+// {prefix}/2006/01/02/2006-01-02-15-04-00.png
+func ComposeKey(prefix string, now time.Time, ext string) string {
+	key := filepath.Join(composeFolder(prefix, now.Year(), int(now.Month()), now.Day()), now.Format(timeFormat))
+	if ext != "" {
+		key += "." + ext
+	}
+
+	return key
 }
