@@ -56,8 +56,6 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 			// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime
 			Release:    os.Getenv("AWS_LAMBDA_FUNCTION_VERSION"),
 			ServerName: os.Getenv("AWS_LAMBDA_FUNCTION_NAME"),
-
-			Debug: true,
 		}); err != nil {
 			return fmt.Errorf("cannot initialize Sentry client: %w", err)
 		}

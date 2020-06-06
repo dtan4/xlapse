@@ -5,13 +5,16 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"sort"
+	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
+	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
@@ -21,6 +24,16 @@ const (
 	defaultDelay   = 10 // 100ms per frame == 10fps
 	defaultGifName = "movie.gif"
 )
+
+var (
+	sentryEnabled = false
+)
+
+func init() {
+	if os.Getenv("SENTRY_DSN") != "" {
+		sentryEnabled = true
+	}
+}
 
 func main() {
 	lambda.Start(HandleRequest)
@@ -35,7 +48,39 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 
 	delay := defaultDelay
 
-	return do(ctx, req.Bucket, req.KeyPrefix, req.Year, req.Month, req.Day, delay)
+	if sentryEnabled {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn: os.Getenv("SENTRY_DSN"),
+			Transport: &sentry.HTTPSyncTransport{
+				Timeout: 5 * time.Second,
+			},
+
+			// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime
+			Release:    os.Getenv("AWS_LAMBDA_FUNCTION_VERSION"),
+			ServerName: os.Getenv("AWS_LAMBDA_FUNCTION_NAME"),
+		}); err != nil {
+			return fmt.Errorf("cannot initialize Sentry client: %w", err)
+		}
+
+		sentry.ConfigureScope(func(scope *sentry.Scope) {
+			scope.SetTag("function", "gif-maker")
+			// We can distinguish target images by bucket and key_prefix
+			scope.SetTag("bucket", req.Bucket)
+			scope.SetTag("key_prefix", req.KeyPrefix)
+
+			scope.SetExtra("gif_request", req)
+		})
+	}
+
+	if err := do(ctx, req.Bucket, req.KeyPrefix, req.Year, req.Month, req.Day, delay); err != nil {
+		if sentryEnabled {
+			sentry.CaptureException(err)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay int) error {
