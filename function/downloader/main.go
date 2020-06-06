@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
+	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
@@ -20,6 +22,16 @@ import (
 const (
 	defaultTimezone = "UTC"
 )
+
+var (
+	sentryEnabled = false
+)
+
+func init() {
+	if os.Getenv("SENTRY_DSN") != "" {
+		sentryEnabled = true
+	}
+}
 
 func HandleRequest(ctx context.Context, entry types.Entry) error {
 	log.Printf("entry: %#v", entry)
@@ -34,7 +46,41 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 	log.Printf("key prefix: %q", entry.KeyPrefix)
 	log.Printf("timezone: %q", timezone)
 
-	return do(ctx, entry.URL, entry.Bucket, entry.KeyPrefix, timezone)
+	if sentryEnabled {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn: os.Getenv("SENTRY_DSN"),
+			Transport: &sentry.HTTPSyncTransport{
+				Timeout: 5 * time.Second,
+			},
+
+			// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime
+			Release:    os.Getenv("AWS_LAMBDA_FUNCTION_VERSION"),
+			ServerName: os.Getenv("AWS_LAMBDA_FUNCTION_NAME"),
+
+			Debug: true,
+		}); err != nil {
+			return fmt.Errorf("cannot initialize Sentry client: %w", err)
+		}
+
+		sentry.ConfigureScope(func(scope *sentry.Scope) {
+			scope.SetTag("function", "downloader")
+			// We can distinguish target images by bucket and key_prefix
+			scope.SetTag("bucket", entry.Bucket)
+			scope.SetTag("key_prefix", entry.KeyPrefix)
+
+			scope.SetExtra("entry", entry)
+		})
+	}
+
+	if err := do(ctx, entry.URL, entry.Bucket, entry.KeyPrefix, timezone); err != nil {
+		if sentryEnabled {
+			sentry.CaptureException(err)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func main() {

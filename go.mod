@@ -6,5 +6,6 @@ require (
 	github.com/aws/aws-lambda-go v1.16.0
 	github.com/aws/aws-sdk-go v1.31.12
 	github.com/aws/aws-xray-sdk-go v1.0.1
-	gopkg.in/yaml.v2 v2.2.2
+	github.com/getsentry/sentry-go v0.6.1
+	gopkg.in/yaml.v2 v2.2.4
 )
