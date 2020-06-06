@@ -18,6 +18,7 @@ import (
 
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
+	"github.com/dtan4/xlapse/version"
 )
 
 const (
@@ -40,6 +41,10 @@ func main() {
 }
 
 func HandleRequest(ctx context.Context, req types.GifRequest) error {
+	log.Printf("function version: %q", version.Version)
+	log.Printf("function built commit: %q", version.Commit)
+	log.Printf("function built date: %q", version.Date)
+
 	log.Printf("bucket: %q", req.Bucket)
 	log.Printf("key prefix: %q", req.KeyPrefix)
 	log.Printf("year: %d", req.Year)
@@ -55,8 +60,8 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 				Timeout: 5 * time.Second,
 			},
 
+			Release: version.Version,
 			// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime
-			Release:    os.Getenv("AWS_LAMBDA_FUNCTION_VERSION"),
 			ServerName: os.Getenv("AWS_LAMBDA_FUNCTION_NAME"),
 		}); err != nil {
 			return fmt.Errorf("cannot initialize Sentry client: %w", err)
