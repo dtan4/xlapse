@@ -63,6 +63,7 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 		}
 
 		sentry.ConfigureScope(func(scope *sentry.Scope) {
+			scope.SetTag("function", "downloader")
 			// We can distinguish target images by bucket and key_prefix
 			scope.SetTag("bucket", entry.Bucket)
 			scope.SetTag("key_prefix", entry.KeyPrefix)
