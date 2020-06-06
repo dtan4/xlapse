@@ -17,6 +17,7 @@ import (
 
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
+	"github.com/dtan4/xlapse/version"
 )
 
 const (
@@ -40,6 +41,10 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 	if timezone == "" {
 		timezone = defaultTimezone
 	}
+
+	log.Printf("function version: %q", version.Version)
+	log.Printf("function built commit: %q", version.Commit)
+	log.Printf("function built date: %q", version.Date)
 
 	log.Printf("url: %q", entry.URL)
 	log.Printf("bucket: %q", entry.Bucket)

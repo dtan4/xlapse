@@ -18,6 +18,7 @@ import (
 
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
+	"github.com/dtan4/xlapse/version"
 )
 
 const (
@@ -40,6 +41,10 @@ func main() {
 }
 
 func HandleRequest(ctx context.Context, req types.GifRequest) error {
+	log.Printf("function version: %q", version.Version)
+	log.Printf("function built commit: %q", version.Commit)
+	log.Printf("function built date: %q", version.Date)
+
 	log.Printf("bucket: %q", req.Bucket)
 	log.Printf("key prefix: %q", req.KeyPrefix)
 	log.Printf("year: %d", req.Year)

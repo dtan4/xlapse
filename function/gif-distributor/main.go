@@ -17,6 +17,7 @@ import (
 	"github.com/dtan4/xlapse/service/lambda"
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
+	"github.com/dtan4/xlapse/version"
 )
 
 var (
@@ -33,6 +34,10 @@ func HandleRequest(ctx context.Context) error {
 	bucket := os.Getenv("BUCKET")
 	key := os.Getenv("KEY")
 	farn := os.Getenv("GIF_MAKER_FUNCTION_ARN")
+
+	log.Printf("function version: %q", version.Version)
+	log.Printf("function built commit: %q", version.Commit)
+	log.Printf("function built date: %q", version.Date)
 
 	log.Printf("bucket: %q", bucket)
 	log.Printf("key: %q", key)
