@@ -51,6 +51,10 @@ Resources:
                 - "s3:PutObject"
                 - "s3:PutObjectAcl"
               Resource: "*"
+      Environment:
+        Variables:
+          # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/dynamic-references.html#dynamic-references-secretsmanager
+          SENTRY_DSN: !Sub '{{resolve:secretsmanager:Sentry:SecretString:dsn}}'
 
   RemoteFileToS3GifDistributor:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
