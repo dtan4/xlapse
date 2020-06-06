@@ -63,7 +63,7 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 		}
 
 		sentry.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetTag("function", "downloader")
+			scope.SetTag("function", "gif-maker")
 			// We can distinguish target images by bucket and key_prefix
 			scope.SetTag("bucket", req.Bucket)
 			scope.SetTag("key_prefix", req.KeyPrefix)
