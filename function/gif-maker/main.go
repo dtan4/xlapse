@@ -60,8 +60,8 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 				Timeout: 5 * time.Second,
 			},
 
+			Release: version.Version,
 			// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime
-			Release:    os.Getenv("AWS_LAMBDA_FUNCTION_VERSION"),
 			ServerName: os.Getenv("AWS_LAMBDA_FUNCTION_NAME"),
 		}); err != nil {
 			return fmt.Errorf("cannot initialize Sentry client: %w", err)
