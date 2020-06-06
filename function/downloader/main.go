@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
+	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
@@ -20,6 +22,16 @@ import (
 const (
 	defaultTimezone = "UTC"
 )
+
+var (
+	sentryEnabled = false
+)
+
+func init() {
+	if os.Getenv("SENTRY_DSN") != "" {
+		sentryEnabled = true
+	}
+}
 
 func HandleRequest(ctx context.Context, entry types.Entry) error {
 	log.Printf("entry: %#v", entry)
@@ -34,7 +46,34 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 	log.Printf("key prefix: %q", entry.KeyPrefix)
 	log.Printf("timezone: %q", timezone)
 
-	return do(ctx, entry.URL, entry.Bucket, entry.KeyPrefix, timezone)
+	if sentryEnabled {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:   os.Getenv("SENTRY_DSN"),
+			Debug: true,
+		}); err != nil {
+			return fmt.Errorf("cannot initialize Sentry client: %w", err)
+		}
+
+		sentry.ConfigureScope(func(scope *sentry.Scope) {
+			// We can distinguish target images by bucket and key_prefix
+			scope.SetTag("bucket", entry.Bucket)
+			scope.SetTag("key_prefix", entry.KeyPrefix)
+
+			scope.SetExtra("entry", entry)
+		})
+
+		defer sentry.Flush(2 * time.Second)
+	}
+
+	if err := do(ctx, entry.URL, entry.Bucket, entry.KeyPrefix, timezone); err != nil {
+		if sentryEnabled {
+			sentry.CaptureException(err)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func main() {
