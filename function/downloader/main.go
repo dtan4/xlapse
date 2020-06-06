@@ -48,7 +48,10 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 
 	if sentryEnabled {
 		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:   os.Getenv("SENTRY_DSN"),
+			Dsn: os.Getenv("SENTRY_DSN"),
+			Transport: &sentry.HTTPSyncTransport{
+				Timeout: 5 * time.Second,
+			},
 			Debug: true,
 		}); err != nil {
 			return fmt.Errorf("cannot initialize Sentry client: %w", err)
@@ -61,8 +64,6 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 
 			scope.SetExtra("entry", entry)
 		})
-
-		defer sentry.Flush(2 * time.Second)
 	}
 
 	if err := do(ctx, entry.URL, entry.Bucket, entry.KeyPrefix, timezone); err != nil {
