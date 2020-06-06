@@ -12,11 +12,22 @@ import (
 	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
 	s3api "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
+	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/lambda"
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
 )
+
+var (
+	sentryEnabled = false
+)
+
+func init() {
+	if os.Getenv("SENTRY_DSN") != "" {
+		sentryEnabled = true
+	}
+}
 
 func HandleRequest(ctx context.Context) error {
 	bucket := os.Getenv("BUCKET")
@@ -27,7 +38,36 @@ func HandleRequest(ctx context.Context) error {
 	log.Printf("key: %q", key)
 	log.Printf("farn: %q", farn)
 
-	return do(ctx, bucket, key, farn)
+	if sentryEnabled {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn: os.Getenv("SENTRY_DSN"),
+			Transport: &sentry.HTTPSyncTransport{
+				Timeout: 5 * time.Second,
+			},
+
+			// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime
+			Release:    os.Getenv("AWS_LAMBDA_FUNCTION_VERSION"),
+			ServerName: os.Getenv("AWS_LAMBDA_FUNCTION_NAME"),
+
+			Debug: true,
+		}); err != nil {
+			return fmt.Errorf("cannot initialize Sentry client: %w", err)
+		}
+
+		sentry.ConfigureScope(func(scope *sentry.Scope) {
+			scope.SetTag("function", "gif-distributor")
+		})
+	}
+
+	if err := do(ctx, bucket, key, farn); err != nil {
+		if sentryEnabled {
+			sentry.CaptureException(err)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func main() {
