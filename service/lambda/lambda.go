@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
 
 	"github.com/dtan4/xlapse/types"
+	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
 const (
@@ -46,7 +47,7 @@ func (c *Client) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, ar
 	return nil
 }
 
-func (c *Client) InvokeGifMakerFuncs(ctx context.Context, req types.GifRequest, arn string) error {
+func (c *Client) InvokeGifMakerFuncs(ctx context.Context, req *v1.GifRequest, arn string) error {
 	payload, err := json.Marshal(req)
 	if err != nil {
 		return fmt.Errorf("cannot decode entry %#v to JSON: %w", req, err)

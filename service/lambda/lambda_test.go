@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -11,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
 
 	"github.com/dtan4/xlapse/types"
+	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
 var (
@@ -121,14 +123,14 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 
 func TestInvokeGifMakerFuncs(t *testing.T) {
 	testcases := map[string]struct {
-		req       types.GifRequest
+		req       *v1.GifRequest
 		arn       string
 		want      [][]byte
 		invokeErr error
 		wantErr   error
 	}{
 		"success": {
-			req: types.GifRequest{
+			req: &v1.GifRequest{
 				Bucket:    "bucket",
 				KeyPrefix: "prefix",
 				Year:      2020,
@@ -143,7 +145,7 @@ func TestInvokeGifMakerFuncs(t *testing.T) {
 			wantErr:   nil,
 		},
 		"error": {
-			req: types.GifRequest{
+			req: &v1.GifRequest{
 				Bucket:    "bucket",
 				KeyPrefix: "prefix",
 				Year:      2020,
@@ -153,7 +155,7 @@ func TestInvokeGifMakerFuncs(t *testing.T) {
 			arn:       "foo",
 			want:      [][]byte{},
 			invokeErr: fmt.Errorf("cannot invoke function"),
-			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with request types.GifRequest{Bucket:"bucket", KeyPrefix:"prefix", Year:2020, Month:4, Day:11}: cannot invoke function`),
+			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with request &v1.GifRequest{`),
 		},
 	}
 
@@ -179,7 +181,7 @@ func TestInvokeGifMakerFuncs(t *testing.T) {
 					t.Errorf("want error %q, got nil", tc.wantErr)
 				}
 
-				if err.Error() != tc.wantErr.Error() {
+				if !strings.HasPrefix(err.Error(), tc.wantErr.Error()) {
 					t.Errorf("want error %q, got %q", tc.wantErr, err)
 				}
 			}
