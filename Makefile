@@ -24,5 +24,8 @@ build-gif-maker:
 	cd function/gif-maker; \
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-gif-maker
 
+protoc-go:
+	protoc --go_out=paths=source_relative:. types/v1/*.proto
+
 test:
 	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
