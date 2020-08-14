@@ -3,14 +3,14 @@ package types
 import (
 	"fmt"
 
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 )
 
 type Entry struct {
-	URL       string `yaml:"url" json:"url"`
-	Bucket    string `yaml:"bucket" json:"bucket"`
-	KeyPrefix string `yaml:"key_prefix" json:"key_prefix"`
-	Timezone  string `yaml:"timezone" json:"timezone"`
+	URL       string `json:"url"`
+	Bucket    string `json:"bucket"`
+	KeyPrefix string `json:"key_prefix"`
+	Timezone  string `json:"timezone"`
 }
 
 type Entries []*Entry
