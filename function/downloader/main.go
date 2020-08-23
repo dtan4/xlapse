@@ -37,7 +37,7 @@ func init() {
 func HandleRequest(ctx context.Context, entry *v1.Entry) error {
 	log.Printf("entry: %#v", entry)
 
-	timezone := entry.Timezone
+	timezone := entry.GetTimezone()
 	if timezone == "" {
 		timezone = defaultTimezone
 	}
@@ -46,9 +46,9 @@ func HandleRequest(ctx context.Context, entry *v1.Entry) error {
 	log.Printf("function built commit: %q", version.Commit)
 	log.Printf("function built date: %q", version.Date)
 
-	log.Printf("url: %q", entry.Url)
-	log.Printf("bucket: %q", entry.Bucket)
-	log.Printf("key prefix: %q", entry.KeyPrefix)
+	log.Printf("url: %q", entry.GetUrl())
+	log.Printf("bucket: %q", entry.GetBucket())
+	log.Printf("key prefix: %q", entry.GetKeyPrefix())
 	log.Printf("timezone: %q", timezone)
 
 	if sentryEnabled {
@@ -68,14 +68,14 @@ func HandleRequest(ctx context.Context, entry *v1.Entry) error {
 		sentry.ConfigureScope(func(scope *sentry.Scope) {
 			scope.SetTag("function", "downloader")
 			// We can distinguish target images by bucket and key_prefix
-			scope.SetTag("bucket", entry.Bucket)
-			scope.SetTag("key_prefix", entry.KeyPrefix)
+			scope.SetTag("bucket", entry.GetBucket())
+			scope.SetTag("key_prefix", entry.GetKeyPrefix())
 
 			scope.SetExtra("entry", entry)
 		})
 	}
 
-	if err := do(ctx, entry.Url, entry.Bucket, entry.KeyPrefix, timezone); err != nil {
+	if err := do(ctx, entry.GetUrl(), entry.GetBucket(), entry.GetKeyPrefix(), timezone); err != nil {
 		if sentryEnabled {
 			sentry.CaptureException(err)
 		}

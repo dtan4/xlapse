@@ -101,7 +101,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 	now := time.Now()
 
 	for _, e := range es {
-		log.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.Url, e.Bucket, e.KeyPrefix, e.Timezone)
+		log.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.GetUrl(), e.GetBucket(), e.GetKeyPrefix(), e.GetTimezone())
 
 		loc, err := time.LoadLocation(e.Timezone)
 		if err != nil {
@@ -113,8 +113,8 @@ func do(ctx context.Context, bucket, key, farn string) error {
 		log.Printf("yesterday: %q", yday.String())
 
 		req := &v1.GifRequest{
-			Bucket:    e.Bucket,
-			KeyPrefix: e.KeyPrefix,
+			Bucket:    e.GetBucket(),
+			KeyPrefix: e.GetKeyPrefix(),
 			Year:      int32(yday.Year()),
 			Month:     int32(yday.Month()),
 			Day:       int32(yday.Day()),
