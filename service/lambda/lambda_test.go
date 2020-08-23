@@ -44,14 +44,14 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 	}{
 		"success": {
 			es: types.Entries{
-				&types.Entry{
-					URL:       "https://example.co.jp/foo.jpg",
+				&v1.Entry{
+					Url:       "https://example.co.jp/foo.jpg",
 					Bucket:    "bucket",
 					KeyPrefix: "prefix",
 					Timezone:  "Asia/Tokyo",
 				},
-				&types.Entry{
-					URL:       "https://example.com.sg/bar.png",
+				&v1.Entry{
+					Url:       "https://example.com.sg/bar.png",
 					Bucket:    "bucket-sg",
 					KeyPrefix: "prefix-sg",
 					Timezone:  "Asia/Singapore",
@@ -67,14 +67,14 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 		},
 		"error": {
 			es: types.Entries{
-				&types.Entry{
-					URL:       "https://example.co.jp/foo.jpg",
+				&v1.Entry{
+					Url:       "https://example.co.jp/foo.jpg",
 					Bucket:    "bucket",
 					KeyPrefix: "prefix",
 					Timezone:  "Asia/Tokyo",
 				},
-				&types.Entry{
-					URL:       "https://example.com.sg/bar.png",
+				&v1.Entry{
+					Url:       "https://example.com.sg/bar.png",
 					Bucket:    "bucket-sg",
 					KeyPrefix: "prefix-sg",
 					Timezone:  "Asia/Singapore",
@@ -83,7 +83,7 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 			arn:       "foo",
 			want:      [][]byte{},
 			invokeErr: fmt.Errorf("cannot invoke function"),
-			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with entry types.Entry{URL:"https://example.co.jp/foo.jpg", Bucket:"bucket", KeyPrefix:"prefix", Timezone:"Asia/Tokyo"}: cannot invoke function`),
+			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with entry v1.Entry`),
 		},
 	}
 
@@ -109,7 +109,7 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 					t.Errorf("want error %q, got nil", tc.wantErr)
 				}
 
-				if err.Error() != tc.wantErr.Error() {
+				if !strings.HasPrefix(err.Error(), tc.wantErr.Error()) {
 					t.Errorf("want error %q, got %q", tc.wantErr, err)
 				}
 			}

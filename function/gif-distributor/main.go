@@ -101,7 +101,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 	now := time.Now()
 
 	for _, e := range es {
-		log.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.URL, e.Bucket, e.KeyPrefix, e.Timezone)
+		log.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.Url, e.Bucket, e.KeyPrefix, e.Timezone)
 
 		loc, err := time.LoadLocation(e.Timezone)
 		if err != nil {

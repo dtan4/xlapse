@@ -3,6 +3,8 @@ package types
 import (
 	"reflect"
 	"testing"
+
+	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
 func TestDecodeEntriesYAML(t *testing.T) {
@@ -21,14 +23,14 @@ func TestDecodeEntriesYAML(t *testing.T) {
   timezone: Asia/Singapore
 `),
 			want: Entries{
-				&Entry{
-					URL:       "https://example.co.jp/foo.jpg",
+				&v1.Entry{
+					Url:       "https://example.co.jp/foo.jpg",
 					Bucket:    "bucket",
 					KeyPrefix: "prefix",
 					Timezone:  "Asia/Tokyo",
 				},
-				&Entry{
-					URL:       "https://example.com.sg/bar.png",
+				&v1.Entry{
+					Url:       "https://example.com.sg/bar.png",
 					Bucket:    "bucket-sg",
 					KeyPrefix: "prefix-sg",
 					Timezone:  "Asia/Singapore",

@@ -16,7 +16,7 @@ import (
 	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/s3"
-	"github.com/dtan4/xlapse/types"
+	v1 "github.com/dtan4/xlapse/types/v1"
 	"github.com/dtan4/xlapse/version"
 )
 
@@ -34,7 +34,7 @@ func init() {
 	}
 }
 
-func HandleRequest(ctx context.Context, entry types.Entry) error {
+func HandleRequest(ctx context.Context, entry *v1.Entry) error {
 	log.Printf("entry: %#v", entry)
 
 	timezone := entry.Timezone
@@ -46,7 +46,7 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 	log.Printf("function built commit: %q", version.Commit)
 	log.Printf("function built date: %q", version.Date)
 
-	log.Printf("url: %q", entry.URL)
+	log.Printf("url: %q", entry.Url)
 	log.Printf("bucket: %q", entry.Bucket)
 	log.Printf("key prefix: %q", entry.KeyPrefix)
 	log.Printf("timezone: %q", timezone)
@@ -75,7 +75,7 @@ func HandleRequest(ctx context.Context, entry types.Entry) error {
 		})
 	}
 
-	if err := do(ctx, entry.URL, entry.Bucket, entry.KeyPrefix, timezone); err != nil {
+	if err := do(ctx, entry.Url, entry.Bucket, entry.KeyPrefix, timezone); err != nil {
 		if sentryEnabled {
 			sentry.CaptureException(err)
 		}
