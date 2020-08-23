@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"reflect"
 	"testing"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/google/go-cmp/cmp"
 )
 
 type mockS3API struct {
@@ -118,8 +118,8 @@ func TestListObjectKeys(t *testing.T) {
 					t.Errorf("want no error, got %q", err.Error())
 				}
 
-				if !reflect.DeepEqual(got, tc.want) {
-					t.Errorf("want %q, got %q", tc.want, got)
+				if diff := cmp.Diff(tc.want, got); diff != "" {
+					t.Errorf("-want +got:\n%s", diff)
 				}
 			} else {
 				if err == nil {

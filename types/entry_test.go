@@ -1,10 +1,11 @@
 package types
 
 import (
-	"reflect"
 	"testing"
 
 	v1 "github.com/dtan4/xlapse/types/v1"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func TestDecodeEntriesYAML(t *testing.T) {
@@ -17,7 +18,7 @@ func TestDecodeEntriesYAML(t *testing.T) {
   bucket: bucket
   key_prefix: prefix
   timezone: Asia/Tokyo
-- url: https://example.com.so/bar.png
+- url: https://example.com.sg/bar.png
   bucket: bucket-sg
   key_prefix: prefix-sg
   timezone: Asia/Singapore
@@ -50,8 +51,12 @@ func TestDecodeEntriesYAML(t *testing.T) {
 				t.Errorf("want %d entries, got %d", len(tc.want), len(got))
 			}
 
-			if reflect.DeepEqual(got, tc.want) {
-				t.Errorf("want %#v, got %#v", tc.want, got)
+			for i := range got {
+				opt := cmpopts.IgnoreUnexported(*tc.want[i])
+
+				if diff := cmp.Diff(*tc.want[i], *got[i], opt); diff != "" {
+					t.Errorf("-want +got:\n%s", diff)
+				}
 			}
 		})
 	}

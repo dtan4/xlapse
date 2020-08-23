@@ -3,13 +3,13 @@ package lambda
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/dtan4/xlapse/types"
 	v1 "github.com/dtan4/xlapse/types/v1"
@@ -101,8 +101,8 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 					t.Errorf("want no error, got %q", err)
 				}
 
-				if !reflect.DeepEqual(gotPayloads, tc.want) {
-					t.Errorf("want %q, got %q", tc.want, gotPayloads)
+				if diff := cmp.Diff(tc.want, gotPayloads); diff != "" {
+					t.Errorf("-want +got:\n%s", diff)
 				}
 			} else {
 				if err == nil {
@@ -173,8 +173,8 @@ func TestInvokeGifMakerFuncs(t *testing.T) {
 					t.Errorf("want no error, got %q", err)
 				}
 
-				if !reflect.DeepEqual(gotPayloads, tc.want) {
-					t.Errorf("want %q, got %q", tc.want, gotPayloads)
+				if diff := cmp.Diff(tc.want, gotPayloads); diff != "" {
+					t.Errorf("-want +got:\n%s", diff)
 				}
 			} else {
 				if err == nil {
