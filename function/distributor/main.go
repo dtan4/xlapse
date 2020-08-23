@@ -94,7 +94,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 	}
 
 	for _, e := range es {
-		fmt.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.URL, e.Bucket, e.KeyPrefix, e.Timezone)
+		fmt.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.GetUrl(), e.GetBucket(), e.GetKeyPrefix(), e.GetTimezone())
 	}
 
 	lambdaAPI := lambdaapi.New(sess)

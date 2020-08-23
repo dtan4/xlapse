@@ -4,16 +4,11 @@ import (
 	"fmt"
 
 	"sigs.k8s.io/yaml"
+
+	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
-type Entry struct {
-	URL       string `json:"url"`
-	Bucket    string `json:"bucket"`
-	KeyPrefix string `json:"key_prefix"`
-	Timezone  string `json:"timezone"`
-}
-
-type Entries []*Entry
+type Entries []*v1.Entry
 
 func DecodeEntriesYAML(body []byte) (Entries, error) {
 	es := Entries{}

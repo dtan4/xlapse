@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package xlapse.types.v1;
+
+option go_package = "github.com/dtan4/xlapse/types/v1";
+
+message Entry {
+  string url = 1;
+  string bucket = 2;
+  string key_prefix = 3;
+  string timezone = 4;
+}
