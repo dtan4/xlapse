@@ -17,6 +17,7 @@ import (
 	"github.com/dtan4/xlapse/service/lambda"
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
+	v1 "github.com/dtan4/xlapse/types/v1"
 	"github.com/dtan4/xlapse/version"
 )
 
@@ -111,12 +112,12 @@ func do(ctx context.Context, bucket, key, farn string) error {
 
 		log.Printf("yesterday: %q", yday.String())
 
-		req := types.GifRequest{
+		req := &v1.GifRequest{
 			Bucket:    e.Bucket,
 			KeyPrefix: e.KeyPrefix,
-			Year:      yday.Year(),
-			Month:     int(yday.Month()),
-			Day:       yday.Day(),
+			Year:      int32(yday.Year()),
+			Month:     int32(yday.Month()),
+			Day:       int32(yday.Day()),
 		}
 
 		log.Printf("invoking gif-maker function for bucket %q key %q", e.Bucket, e.KeyPrefix)

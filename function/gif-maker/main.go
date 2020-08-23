@@ -17,7 +17,7 @@ import (
 	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/s3"
-	"github.com/dtan4/xlapse/types"
+	v1 "github.com/dtan4/xlapse/types/v1"
 	"github.com/dtan4/xlapse/version"
 )
 
@@ -40,16 +40,16 @@ func main() {
 	lambda.Start(HandleRequest)
 }
 
-func HandleRequest(ctx context.Context, req types.GifRequest) error {
+func HandleRequest(ctx context.Context, req *v1.GifRequest) error {
 	log.Printf("function version: %q", version.Version)
 	log.Printf("function built commit: %q", version.Commit)
 	log.Printf("function built date: %q", version.Date)
 
-	log.Printf("bucket: %q", req.Bucket)
-	log.Printf("key prefix: %q", req.KeyPrefix)
-	log.Printf("year: %d", req.Year)
-	log.Printf("month: %d", req.Month)
-	log.Printf("day: %d", req.Day)
+	log.Printf("bucket: %q", req.GetBucket())
+	log.Printf("key prefix: %q", req.GetKeyPrefix())
+	log.Printf("year: %d", req.GetYear())
+	log.Printf("month: %d", req.GetMonth())
+	log.Printf("day: %d", req.GetDay())
 
 	delay := defaultDelay
 
@@ -70,14 +70,14 @@ func HandleRequest(ctx context.Context, req types.GifRequest) error {
 		sentry.ConfigureScope(func(scope *sentry.Scope) {
 			scope.SetTag("function", "gif-maker")
 			// We can distinguish target images by bucket and key_prefix
-			scope.SetTag("bucket", req.Bucket)
-			scope.SetTag("key_prefix", req.KeyPrefix)
+			scope.SetTag("bucket", req.GetBucket())
+			scope.SetTag("key_prefix", req.GetKeyPrefix())
 
-			scope.SetExtra("gif_request", req)
+			scope.SetExtra("gif_request", *req)
 		})
 	}
 
-	if err := do(ctx, req.Bucket, req.KeyPrefix, req.Year, req.Month, req.Day, delay); err != nil {
+	if err := do(ctx, req.Bucket, req.KeyPrefix, int(req.GetYear()), int(req.GetMonth()), int(req.GetDay()), delay); err != nil {
 		if sentryEnabled {
 			sentry.CaptureException(err)
 		}

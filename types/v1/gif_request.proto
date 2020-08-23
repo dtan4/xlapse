@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package xlapse.types.v1;
+
+option go_package = "github.com/dtan4/xlapse/types/v1";
+
+message GifRequest {
+  string bucket = 1;
+  string key_prefix = 2;
+  int32 year = 3;
+  int32 month = 4;
+  int32 day = 5;
+}
