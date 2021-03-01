@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/aws/aws-lambda-go v1.19.1
 	github.com/aws/aws-sdk-go v1.34.0
-	github.com/aws/aws-xray-sdk-go v1.1.0
+	github.com/aws/aws-xray-sdk-go v1.3.0
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/golang/protobuf v1.4.1
 	github.com/google/go-cmp v0.5.2
