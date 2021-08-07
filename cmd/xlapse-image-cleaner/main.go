@@ -17,7 +17,6 @@ import (
 
 const (
 	usage              = "xlapse-image-cleaner S3_BUCKET"
-	movieGifFilename   = "movie.gif"
 	maxObjectsToDelete = 1000
 )
 
