@@ -35,14 +35,16 @@ type s3Client struct {
 func (c *s3Client) deleteObjects(ctx context.Context, bucket string, objects []types.ObjectIdentifier, dryRun bool) ([]types.DeletedObject, error) {
 	c.logger.Info(fmt.Sprintf("deleting %d objects", len(objects)))
 
-	deleted := []types.DeletedObject{}
+	var deleted []types.DeletedObject
 
 	if dryRun {
-		for _, obj := range objects {
+		deleted = make([]types.DeletedObject, len(objects))
+
+		for i, obj := range objects {
 			c.logger.Info("(dry-run) deleted", zap.String("key", aws.ToString(obj.Key)))
-			deleted = append(deleted, types.DeletedObject{
+			deleted[i] = types.DeletedObject{
 				Key: obj.Key,
-			})
+			}
 		}
 	} else {
 		resp, err := c.client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
