@@ -1063,3 +1063,6 @@ def go_dependencies():
         sum = "h1:mZQZefskPPCMIBCSEH0v2/iUqqLrYtaeqwD6FUGUnFE=",
         version = "v1.19.0",
     )
+
+def go_dependenciest():
+    pass
