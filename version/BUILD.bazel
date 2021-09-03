@@ -9,5 +9,5 @@ go_library(
         "github.com/dtan4/xlapse/version.Version": "{RELEASE_VERSION}",
         "github.com/dtan4/xlapse/version.Commit": "{RELEASE_COMMIT}",
         "github.com/dtan4/xlapse/version.Date": "{RELEASE_DATE}",
-    }
+    },
 )
