@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TARBALL_NAME="xlapse_linux_amd64.tar.gz"
+TARBALL_NAME="xlapse_Linux_x86_64.tar.gz"
 
 create_tarball() {
   echo "[INFO] Creating tarball"
