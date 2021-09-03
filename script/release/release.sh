@@ -21,7 +21,7 @@ create_tarball() {
 upload_tarball_to_github_release() {
   echo "[INFO] Uploading tarball to GitHub Release"
 
-  gh release create "${GITHUB_REF}" "${TARBALL_NAME}"
+  gh release create "${GITHUB_REF##*/}" "${TARBALL_NAME}"
 }
 
 main() {

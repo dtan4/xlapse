@@ -8,7 +8,7 @@ main() {
   set -o pipefail
 
   # https://docs.github.com/en/actions/reference/environment-variables
-  echo RELEASE_VERSION "$(printf "%s" "${GITHUB_REF}" | sed -E "s/^v//")"
+  echo RELEASE_VERSION "$(printf "%s" "${GITHUB_REF##*/}" | sed -E "s/^v//")"
   echo RELEASE_COMMIT "${GITHUB_SHA}"
   echo RELEASE_DATE "$(TZ=UTC date "+%Y-%m-%dT%H:%M:%SZ")"
 }
