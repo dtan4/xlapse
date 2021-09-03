@@ -16,6 +16,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "/home/runner/.cache/bazel"
+          key: bazel
       - name: Install Bazelisk
         run: |
           curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64"
