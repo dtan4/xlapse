@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "types",
+    srcs = [
+        "entry.pb.go",
+        "gif_request.pb.go",
+    ],
+    importpath = "github.com/dtan4/xlapse/types/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_golang_protobuf//proto",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//runtime/protoimpl",
+    ],
+)

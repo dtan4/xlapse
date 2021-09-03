@@ -1,0 +1,23 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "types",
+    srcs = ["entry.go"],
+    importpath = "github.com/dtan4/xlapse/types",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//types/v1:types",
+        "@io_k8s_sigs_yaml//:yaml",
+    ],
+)
+
+go_test(
+    name = "types_test",
+    srcs = ["entry_test.go"],
+    embed = [":types"],
+    deps = [
+        "//types/v1:types",
+        "@com_github_google_go_cmp//cmp",
+        "@com_github_google_go_cmp//cmp/cmpopts",
+    ],
+)

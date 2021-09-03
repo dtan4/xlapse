@@ -1,0 +1,27 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "gif-distributor_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/dtan4/xlapse/function/gif-distributor",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//service/lambda",
+        "//service/s3",
+        "//types",
+        "//types/v1:types",
+        "//version",
+        "@com_github_aws_aws_lambda_go//lambda",
+        "@com_github_aws_aws_sdk_go//aws/session",
+        "@com_github_aws_aws_sdk_go//service/lambda",
+        "@com_github_aws_aws_sdk_go//service/s3",
+        "@com_github_aws_aws_xray_sdk_go//xray",
+        "@com_github_getsentry_sentry_go//:sentry-go",
+    ],
+)
+
+go_binary(
+    name = "gif-distributor",
+    embed = [":gif-distributor_lib"],
+    visibility = ["//visibility:public"],
+)

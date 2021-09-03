@@ -1,0 +1,34 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+
+go_library(
+    name = "gif-maker_lib",
+    srcs = [
+        "gif.go",
+        "main.go",
+    ],
+    importpath = "github.com/dtan4/xlapse/function/gif-maker",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//service/s3",
+        "//types/v1:types",
+        "//version",
+        "@com_github_aws_aws_lambda_go//lambda",
+        "@com_github_aws_aws_sdk_go//aws/session",
+        "@com_github_aws_aws_sdk_go//service/s3",
+        "@com_github_aws_aws_xray_sdk_go//xray",
+        "@com_github_getsentry_sentry_go//:sentry-go",
+    ],
+)
+
+go_binary(
+    name = "gif-maker",
+    embed = [":gif-maker_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "gif-maker_test",
+    srcs = ["gif_test.go"],
+    data = glob(["testdata/**"]),
+    embed = [":gif-maker_lib"],
+)

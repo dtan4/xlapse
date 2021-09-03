@@ -1,0 +1,21 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "xlapse-image-cleaner_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/dtan4/xlapse/cmd/xlapse-image-cleaner",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@com_github_aws_aws_sdk_go_v2//aws",
+        "@com_github_aws_aws_sdk_go_v2_config//:config",
+        "@com_github_aws_aws_sdk_go_v2_service_s3//:s3",
+        "@com_github_aws_aws_sdk_go_v2_service_s3//types",
+        "@org_uber_go_zap//:zap",
+    ],
+)
+
+go_binary(
+    name = "xlapse-image-cleaner",
+    embed = [":xlapse-image-cleaner_lib"],
+    visibility = ["//visibility:public"],
+)

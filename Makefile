@@ -1,31 +1,20 @@
-NAME := xlapse
+.PHONY: build-cmds
+build-cmds:
+	bazel build //cmd/...
 
-LDFLAGS  := -ldflags="-s -w"
+.PHONY: build-functions
+build-functions:
+	bazel build --config linux //function/...
 
-.DEFAULT_GOAL := build
-
-export GO111MODULE=on
-
-build: build-distributor build-downloader build-gif-distributor build-gif-maker
-
-build-distributor:
-	cd function/distributor; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-distributor
-
-build-downloader:
-	cd function/downloader; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-downloader
-
-build-gif-distributor:
-	cd function/gif-distributor; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-gif-distributor
-
-build-gif-maker:
-	cd function/gif-maker; \
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(LDFLAGS) -o ../../bin/$(NAME)-gif-maker
-
+.PHONY: protoc-go
 protoc-go:
 	protoc --go_out=paths=source_relative:. types/v1/*.proto
 
+.PHONY: update-bazel-files
+update-bazel-files:
+	bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%go_dependencies
+	bazel run //:gazelle
+
+.PHONY: test
 test:
-	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
+	bazel test //...
