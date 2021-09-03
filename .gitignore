@@ -47,3 +47,6 @@
 /bazel-*
 
 # End of https://www.toptal.com/developers/gitignore/api/bazel
+
+/dist
+/*.tar.gz
