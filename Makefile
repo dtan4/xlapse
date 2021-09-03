@@ -10,9 +10,10 @@ build-functions:
 protoc-go:
 	protoc --go_out=paths=source_relative:. types/v1/*.proto
 
-.PHONY: update-bazel-deps
-update-bazel-deps:
+.PHONY: update-bazel-files
+update-bazel-files:
 	bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%go_dependencies
+	bazel run //:gazelle
 
 .PHONY: test
 test:
