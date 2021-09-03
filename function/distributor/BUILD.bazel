@@ -10,12 +10,12 @@ go_library(
         "//service/s3",
         "//types",
         "//version",
-        "@com_github_aws_aws_lambda_go//lambda:go_default_library",
-        "@com_github_aws_aws_sdk_go//aws/session:go_default_library",
-        "@com_github_aws_aws_sdk_go//service/lambda:go_default_library",
-        "@com_github_aws_aws_sdk_go//service/s3:go_default_library",
-        "@com_github_aws_aws_xray_sdk_go//xray:go_default_library",
-        "@com_github_getsentry_sentry_go//:go_default_library",
+        "@com_github_aws_aws_lambda_go//lambda",
+        "@com_github_aws_aws_sdk_go//aws/session",
+        "@com_github_aws_aws_sdk_go//service/lambda",
+        "@com_github_aws_aws_sdk_go//service/s3",
+        "@com_github_aws_aws_xray_sdk_go//xray",
+        "@com_github_getsentry_sentry_go//:sentry-go",
     ],
 )
 

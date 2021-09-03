@@ -8,9 +8,9 @@ go_library(
     deps = [
         "//types",
         "//types/v1:types",
-        "@com_github_aws_aws_sdk_go//aws:go_default_library",
-        "@com_github_aws_aws_sdk_go//service/lambda:go_default_library",
-        "@com_github_aws_aws_sdk_go//service/lambda/lambdaiface:go_default_library",
+        "@com_github_aws_aws_sdk_go//aws",
+        "@com_github_aws_aws_sdk_go//service/lambda",
+        "@com_github_aws_aws_sdk_go//service/lambda/lambdaiface",
     ],
 )
 
@@ -21,9 +21,9 @@ go_test(
     deps = [
         "//types",
         "//types/v1:types",
-        "@com_github_aws_aws_sdk_go//aws/request:go_default_library",
-        "@com_github_aws_aws_sdk_go//service/lambda:go_default_library",
-        "@com_github_aws_aws_sdk_go//service/lambda/lambdaiface:go_default_library",
-        "@com_github_google_go_cmp//cmp:go_default_library",
+        "@com_github_aws_aws_sdk_go//aws/request",
+        "@com_github_aws_aws_sdk_go//service/lambda",
+        "@com_github_aws_aws_sdk_go//service/lambda/lambdaiface",
+        "@com_github_google_go_cmp//cmp",
     ],
 )
