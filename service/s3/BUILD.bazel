@@ -1,0 +1,26 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "s3",
+    srcs = ["s3.go"],
+    importpath = "github.com/dtan4/xlapse/service/s3",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_aws_aws_sdk_go//aws:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/s3:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/s3/s3iface:go_default_library",
+    ],
+)
+
+go_test(
+    name = "s3_test",
+    srcs = ["s3_test.go"],
+    embed = [":s3"],
+    deps = [
+        "@com_github_aws_aws_sdk_go//aws:go_default_library",
+        "@com_github_aws_aws_sdk_go//aws/request:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/s3:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/s3/s3iface:go_default_library",
+        "@com_github_google_go_cmp//cmp:go_default_library",
+    ],
+)
