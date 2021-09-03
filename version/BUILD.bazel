@@ -5,4 +5,9 @@ go_library(
     srcs = ["version.go"],
     importpath = "github.com/dtan4/xlapse/version",
     visibility = ["//visibility:public"],
+    x_defs = {
+        "github.com/dtan4/xlapse/version.Version": "{RELEASE_VERSION}",
+        "github.com/dtan4/xlapse/version.Commit": "{RELEASE_COMMIT}",
+        "github.com/dtan4/xlapse/version.Date": "{RELEASE_DATE}",
+    }
 )
