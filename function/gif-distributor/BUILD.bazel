@@ -16,7 +16,6 @@ go_library(
         "@com_github_aws_aws_sdk_go_v2_service_lambda//:lambda",
         "@com_github_aws_aws_sdk_go_v2_service_s3//:s3",
         "@com_github_aws_aws_xray_sdk_go//instrumentation/awsv2",
-        "@com_github_aws_aws_xray_sdk_go//xray",
         "@com_github_getsentry_sentry_go//:sentry-go",
     ],
 )

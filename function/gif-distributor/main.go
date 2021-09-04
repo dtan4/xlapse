@@ -12,7 +12,6 @@ import (
 	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
 	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
-	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/lambda"
@@ -80,9 +79,6 @@ func main() {
 }
 
 func do(ctx context.Context, bucket, key, farn string) error {
-	ctx, root := xray.BeginSegment(ctx, "xlapse-gif-distributor")
-	defer root.Close(nil)
-
 	cfg, err := configv2.LoadDefaultConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot load default AWS SDK config: %w", err)

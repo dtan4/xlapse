@@ -14,7 +14,6 @@ import (
 	configv2 "github.com/aws/aws-sdk-go-v2/config"
 	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
-	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/s3"
@@ -90,9 +89,6 @@ func HandleRequest(ctx context.Context, req *v1.GifRequest) error {
 }
 
 func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay int) error {
-	ctx, root := xray.BeginSegment(ctx, "xlapse-gif-maker")
-	defer root.Close(nil)
-
 	cfg, err := configv2.LoadDefaultConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot load default AWS SDK config: %w", err)

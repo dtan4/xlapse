@@ -108,9 +108,6 @@ func do(ctx context.Context, url, bucket, keyPrefix, timezone string) error {
 		return fmt.Errorf("cannot download file from %q: %w", url, err)
 	}
 
-	ctx, root := xray.BeginSegment(ctx, "xlapse-downloader")
-	defer root.Close(nil)
-
 	cfg, err := configv2.LoadDefaultConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot load default AWS SDK config: %w", err)
