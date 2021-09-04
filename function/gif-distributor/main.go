@@ -83,7 +83,7 @@ func main() {
 func do(ctx context.Context, bucket, key, farn string) error {
 	sess := session.New()
 
-	ctx, root := xray.BeginSegment(ctx, "xlapse-distributor")
+	ctx, root := xray.BeginSegment(ctx, "xlapse-gif-distributor")
 	defer root.Close(nil)
 
 	cfg, err := configv2.LoadDefaultConfig(ctx)
