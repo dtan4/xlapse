@@ -90,7 +90,7 @@ func HandleRequest(ctx context.Context, req *v1.GifRequest) error {
 }
 
 func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay int) error {
-	ctx, root := xray.BeginSegment(ctx, "xlapse-downloader")
+	ctx, root := xray.BeginSegment(ctx, "xlapse-gif-maker")
 	defer root.Close(nil)
 
 	cfg, err := configv2.LoadDefaultConfig(ctx)
