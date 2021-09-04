@@ -93,6 +93,13 @@ def go_dependencies():
         version = "v1.7.0",
     )
     go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_service_lambda",
+        importpath = "github.com/aws/aws-sdk-go-v2/service/lambda",
+        sum = "h1:e3HnYYEYVJukFUwDfadfCJz23Ys9Y4xow09gziErDQ8=",
+        version = "v1.8.0",
+    )
+
+    go_repository(
         name = "com_github_aws_aws_sdk_go_v2_service_route53",
         importpath = "github.com/aws/aws-sdk-go-v2/service/route53",
         sum = "h1:OsggywXCk9iFKdu2Aopg3e1oJITIuyW36hA/B0rqupE=",
