@@ -21,19 +21,54 @@ const (
 
 type APIV2 interface {
 	GetObject(context.Context, *s3v2.GetObjectInput, ...func(*s3v2.Options)) (*s3v2.GetObjectOutput, error)
+	ListObjectsV2(context.Context, *s3v2.ListObjectsV2Input, ...func(*s3v2.Options)) (*s3v2.ListObjectsV2Output, error)
 	PutObject(context.Context, *s3v2.PutObjectInput, ...func(*s3v2.Options)) (*s3v2.PutObjectOutput, error)
 }
 
+type ListObjectV2Pager interface {
+	HasMorePages() bool
+	NextPage(context.Context, ...func(*s3v2.Options)) (*s3v2.ListObjectsV2Output, error)
+}
+
+type ListObjectsV2PagerFactory func(client s3v2.ListObjectsV2APIClient, params *s3v2.ListObjectsV2Input, optFns ...func(*s3v2.ListObjectsV2PaginatorOptions)) ListObjectV2Pager
+
 // ClientV2 represents the wrapper of S3 API Client using AWS SDK V2
 type ClientV2 struct {
-	api APIV2
+	api                       APIV2
+	listObjectsV2PagerFactory ListObjectsV2PagerFactory
 }
 
 // NewV2 creates new ClientV2
 func NewV2(api APIV2) *ClientV2 {
 	return &ClientV2{
 		api: api,
+		listObjectsV2PagerFactory: func(client s3v2.ListObjectsV2APIClient, params *s3v2.ListObjectsV2Input, optFns ...func(*s3v2.ListObjectsV2PaginatorOptions)) ListObjectV2Pager {
+			return s3v2.NewListObjectsV2Paginator(client, params)
+		},
 	}
+}
+
+// ListObjectKeys retrieves the list of keys in the given S3 bucket and folder
+func (c *ClientV2) ListObjectKeys(ctx context.Context, bucket, folder string) ([]string, error) {
+	keys := []string{}
+
+	paginator := c.listObjectsV2PagerFactory(c.api, &s3v2.ListObjectsV2Input{
+		Bucket: awsv2.String(bucket),
+		Prefix: awsv2.String(folder),
+	})
+
+	for paginator.HasMorePages() {
+		out, err := paginator.NextPage(ctx)
+		if err != nil {
+			return []string{}, fmt.Errorf("cannot retrieve object list from S3 (bucket: %q, folder: %q): %w", bucket, folder, err)
+		}
+
+		for _, c := range out.Contents {
+			keys = append(keys, awsv2.ToString(c.Key))
+		}
+	}
+
+	return keys, nil
 }
 
 // GetObject downloads an object from the specified S3 location
