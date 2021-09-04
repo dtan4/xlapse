@@ -10,8 +10,7 @@ import (
 	baselambda "github.com/aws/aws-lambda-go/lambda"
 	configv2 "github.com/aws/aws-sdk-go-v2/config"
 	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
-	"github.com/aws/aws-sdk-go/aws/session"
-	s3api "github.com/aws/aws-sdk-go/service/s3"
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/getsentry/sentry-go"
@@ -81,8 +80,6 @@ func main() {
 }
 
 func do(ctx context.Context, bucket, key, farn string) error {
-	sess := session.New()
-
 	ctx, root := xray.BeginSegment(ctx, "xlapse-gif-distributor")
 	defer root.Close(nil)
 
@@ -93,9 +90,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 
 	awsv2.AWSV2Instrumentor(&cfg.APIOptions)
 
-	s3API := s3api.New(sess)
-	xray.AWS(s3API.Client)
-	s3Client := s3.New(s3API)
+	s3Client := s3.NewV2(s3v2.NewFromConfig(cfg))
 
 	body, err := s3Client.GetObject(ctx, bucket, key)
 	if err != nil {

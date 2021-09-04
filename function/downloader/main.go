@@ -10,8 +10,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws/session"
-	s3api "github.com/aws/aws-sdk-go/service/s3"
+	configv2 "github.com/aws/aws-sdk-go-v2/config"
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/getsentry/sentry-go"
 
@@ -107,10 +108,17 @@ func do(ctx context.Context, url, bucket, keyPrefix, timezone string) error {
 		return fmt.Errorf("cannot download file from %q: %w", url, err)
 	}
 
-	sess := session.New()
-	api := s3api.New(sess)
-	xray.AWS(api.Client)
-	s3Client := s3.New(api)
+	ctx, root := xray.BeginSegment(ctx, "xlapse-downloader")
+	defer root.Close(nil)
+
+	cfg, err := configv2.LoadDefaultConfig(ctx)
+	if err != nil {
+		return fmt.Errorf("cannot load default AWS SDK config: %w", err)
+	}
+
+	awsv2.AWSV2Instrumentor(&cfg.APIOptions)
+
+	s3Client := s3.NewV2(s3v2.NewFromConfig(cfg))
 
 	now := time.Now().In(loc)
 	key := s3.ComposeKey(keyPrefix, now, ext)
