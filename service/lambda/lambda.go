@@ -14,7 +14,7 @@ import (
 )
 
 type APIV2 interface {
-	Invoke(ctx context.Context, params *lambdav2.InvokeInput, optFns ...func(*lambdav2.Options)) (*lambdav2.InvokeOutput, error)
+	Invoke(context.Context, *lambdav2.InvokeInput, ...func(*lambdav2.Options)) (*lambdav2.InvokeOutput, error)
 }
 
 type ClientV2 struct {
