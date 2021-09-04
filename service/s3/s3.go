@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
+	awsv2 "github.com/aws/aws-sdk-go-v2/aws"
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
@@ -16,6 +18,56 @@ import (
 const (
 	timeFormat = "2006-01-02-15-04-05"
 )
+
+type APIV2 interface {
+	GetObject(context.Context, *s3v2.GetObjectInput, ...func(*s3v2.Options)) (*s3v2.GetObjectOutput, error)
+	PutObject(context.Context, *s3v2.PutObjectInput, ...func(*s3v2.Options)) (*s3v2.PutObjectOutput, error)
+}
+
+// ClientV2 represents the wrapper of S3 API Client using AWS SDK V2
+type ClientV2 struct {
+	api APIV2
+}
+
+// NewV2 creates new ClientV2
+func NewV2(api APIV2) *ClientV2 {
+	return &ClientV2{
+		api: api,
+	}
+}
+
+// GetObject downloads an object from the specified S3 location
+func (c *ClientV2) GetObject(ctx context.Context, bucket, key string) ([]byte, error) {
+	out, err := c.api.GetObject(ctx, &s3v2.GetObjectInput{
+		Bucket: awsv2.String(bucket),
+		Key:    awsv2.String(key),
+	})
+	if err != nil {
+		return []byte{}, fmt.Errorf("cannot download S3 object from bucket: %q, key: %q: %w", bucket, key, err)
+	}
+	defer out.Body.Close()
+
+	body, err := ioutil.ReadAll(out.Body)
+	if err != nil {
+		return []byte{}, fmt.Errorf("cannot read S3 object from bucket: %q, key: %q: %w", bucket, key, err)
+	}
+
+	return body, nil
+}
+
+// Upload uploads the given stream to the given S3 location
+func (c *ClientV2) Upload(ctx context.Context, bucket, key string, reader io.ReadSeeker) error {
+	_, err := c.api.PutObject(ctx, &s3v2.PutObjectInput{
+		Bucket: awsv2.String(bucket),
+		Key:    awsv2.String(key),
+		Body:   reader,
+	})
+	if err != nil {
+		return fmt.Errorf("cannot upload file to S3: %w", err)
+	}
+
+	return nil
+}
 
 // Client represents the wrapper of S3 API Client
 type Client struct {

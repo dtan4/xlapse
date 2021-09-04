@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -15,11 +16,144 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+type mockAPIV2 struct {
+	body []byte
+	err  error
+}
+
 type mockS3API struct {
 	s3iface.S3API
 	body []byte
 	keys []string
 	err  error
+}
+
+func (m *mockAPIV2) GetObject(ctx context.Context, input *s3v2.GetObjectInput, opts ...func(*s3v2.Options)) (*s3v2.GetObjectOutput, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+
+	return &s3v2.GetObjectOutput{
+		Body: ioutil.NopCloser(bytes.NewReader(m.body)),
+	}, nil
+}
+
+func (m *mockAPIV2) PutObject(ctx context.Context, input *s3v2.PutObjectInput, opts ...func(*s3v2.Options)) (*s3v2.PutObjectOutput, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+
+	return nil, nil
+}
+
+func TestGetObjectV2(t *testing.T) {
+	testcases := map[string]struct {
+		bucket    string
+		key       string
+		body      string
+		want      []byte
+		getErr    error
+		expectErr error
+	}{
+		"success": {
+			bucket:    "test",
+			key:       "foo",
+			body:      "bar",
+			want:      []byte("bar"),
+			getErr:    nil,
+			expectErr: nil,
+		},
+		"error": {
+			bucket:    "test",
+			key:       "foo",
+			body:      "",
+			want:      []byte{},
+			getErr:    fmt.Errorf("cannot upload"),
+			expectErr: fmt.Errorf(`cannot download S3 object from bucket: "test", key: "foo": cannot upload`),
+		},
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			client := &ClientV2{api: &mockAPIV2{
+				body: []byte(tc.body),
+				err:  tc.getErr,
+			}}
+
+			got, err := client.GetObject(ctx, tc.bucket, tc.key)
+			if tc.expectErr == nil {
+				if err != nil {
+					t.Errorf("want no error, got: %q", err.Error())
+				}
+
+				if bytes.Compare(got, tc.want) != 0 {
+					t.Errorf("want %q, got %q", string(tc.want), string(got))
+				}
+			} else {
+				if err == nil {
+					t.Errorf("want error: %q, got nil", tc.expectErr.Error())
+				}
+
+				if err.Error() != tc.expectErr.Error() {
+					t.Errorf("want error: %q, got: %q", tc.expectErr.Error(), err.Error())
+				}
+			}
+		})
+	}
+}
+
+func TestUploadV2(t *testing.T) {
+	testcases := map[string]struct {
+		bucket    string
+		key       string
+		body      string
+		uploadErr error
+		expectErr error
+	}{
+		"success": {
+			bucket:    "test",
+			key:       "test.jpg",
+			body:      "foo",
+			uploadErr: nil,
+			expectErr: nil,
+		},
+		"error": {
+			bucket:    "test",
+			key:       "test.jpg",
+			body:      "foo",
+			uploadErr: fmt.Errorf("cannot upload"),
+			expectErr: fmt.Errorf("cannot upload file to S3: cannot upload"),
+		},
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			reader := bytes.NewReader([]byte(tc.body))
+
+			client := &ClientV2{api: &mockAPIV2{
+				err: tc.uploadErr,
+			}}
+
+			err := client.Upload(ctx, tc.bucket, tc.key, reader)
+			if tc.expectErr == nil {
+				if err != nil {
+					t.Errorf("want no error, got: %q", err.Error())
+				}
+			} else {
+				if err == nil {
+					t.Errorf("want error: %q, got nil", tc.expectErr.Error())
+				}
+
+				if err.Error() != tc.expectErr.Error() {
+					t.Errorf("want error: %q, got: %q", tc.expectErr.Error(), err.Error())
+				}
+			}
+		})
+	}
 }
 
 func (m *mockS3API) ListObjectsV2PagesWithContext(ctx aws.Context, input *s3.ListObjectsV2Input, fn func(*s3.ListObjectsV2Output, bool) bool, opts ...request.Option) error {
