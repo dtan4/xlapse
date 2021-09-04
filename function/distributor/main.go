@@ -8,10 +8,10 @@ import (
 	"time"
 
 	baselambda "github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws/session"
-	lambdaapi "github.com/aws/aws-sdk-go/service/lambda"
-	s3api "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-xray-sdk-go/xray"
+	configv2 "github.com/aws/aws-sdk-go-v2/config"
+	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
 	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/lambda"
@@ -78,10 +78,14 @@ func main() {
 }
 
 func do(ctx context.Context, bucket, key, farn string) error {
-	sess := session.New()
-	s3API := s3api.New(sess)
-	xray.AWS(s3API.Client)
-	s3Client := s3.New(s3API)
+	cfg, err := configv2.LoadDefaultConfig(ctx)
+	if err != nil {
+		return fmt.Errorf("cannot load default AWS SDK config: %w", err)
+	}
+
+	awsv2.AWSV2Instrumentor(&cfg.APIOptions)
+
+	s3Client := s3.NewV2(s3v2.NewFromConfig(cfg))
 
 	body, err := s3Client.GetObject(ctx, bucket, key)
 	if err != nil {
@@ -97,9 +101,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 		fmt.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.GetUrl(), e.GetBucket(), e.GetKeyPrefix(), e.GetTimezone())
 	}
 
-	lambdaAPI := lambdaapi.New(sess)
-	xray.AWS(lambdaAPI.Client)
-	lambdaClient := lambda.New(lambdaAPI)
+	lambdaClient := lambda.NewV2(lambdav2.NewFromConfig(cfg))
 
 	if err := lambdaClient.InvokeDownloaderFuncs(ctx, es, farn); err != nil {
 		return fmt.Errorf("cannot invoke download functions: %w", err)

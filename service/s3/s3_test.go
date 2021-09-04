@@ -8,51 +8,49 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	awsv2 "github.com/aws/aws-sdk-go-v2/aws"
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
+	s3v2types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/google/go-cmp/cmp"
 )
 
-type mockS3API struct {
-	s3iface.S3API
+type mockAPIV2 struct {
 	body []byte
-	keys []string
 	err  error
 }
 
-func (m *mockS3API) ListObjectsV2PagesWithContext(ctx aws.Context, input *s3.ListObjectsV2Input, fn func(*s3.ListObjectsV2Output, bool) bool, opts ...request.Option) error {
-	if m.err != nil {
-		return m.err
-	}
-
-	objects := []*s3.Object{}
-
-	for _, k := range m.keys {
-		objects = append(objects, &s3.Object{
-			Key: aws.String(k),
-		})
-	}
-
-	_ = fn(&s3.ListObjectsV2Output{
-		Contents: objects,
-	}, true)
-
-	return nil
+type mockListObjectsV2Pager struct {
+	pageNum int
+	pages   []*s3v2.ListObjectsV2Output
+	err     error
 }
 
-func (m *mockS3API) GetObjectWithContext(ctx context.Context, input *s3.GetObjectInput, opts ...request.Option) (*s3.GetObjectOutput, error) {
+func (m *mockListObjectsV2Pager) HasMorePages() bool {
+	return m.pageNum < len(m.pages)
+}
+
+func (m *mockListObjectsV2Pager) NextPage(ctx context.Context, optFns ...func(*s3v2.Options)) (*s3v2.ListObjectsV2Output, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
 
-	return &s3.GetObjectOutput{
+	output := m.pages[m.pageNum]
+	m.pageNum++
+
+	return output, nil
+}
+
+func (m *mockAPIV2) GetObject(ctx context.Context, input *s3v2.GetObjectInput, opts ...func(*s3v2.Options)) (*s3v2.GetObjectOutput, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+
+	return &s3v2.GetObjectOutput{
 		Body: ioutil.NopCloser(bytes.NewReader(m.body)),
 	}, nil
 }
 
-func (m *mockS3API) PutObjectWithContext(ctx context.Context, input *s3.PutObjectInput, opts ...request.Option) (*s3.PutObjectOutput, error) {
+func (m *mockAPIV2) ListObjectsV2(ctx context.Context, params *s3v2.ListObjectsV2Input, optFns ...func(*s3v2.Options)) (*s3v2.ListObjectsV2Output, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
@@ -60,81 +58,15 @@ func (m *mockS3API) PutObjectWithContext(ctx context.Context, input *s3.PutObjec
 	return nil, nil
 }
 
-func TestListObjectKeys(t *testing.T) {
-	testcases := map[string]struct {
-		bucket    string
-		folder    string
-		keys      []string
-		want      []string
-		listErr   error
-		expectErr error
-	}{
-		"success": {
-			bucket: "test",
-			folder: "2020/04/01/",
-			keys: []string{
-				"2020/04/01/foo",
-				"2020/04/01/bar",
-				"2020/04/01/baz",
-			},
-			want: []string{
-				"2020/04/01/foo",
-				"2020/04/01/bar",
-				"2020/04/01/baz",
-			},
-			listErr:   nil,
-			expectErr: nil,
-		},
-		"error": {
-			bucket: "test",
-			folder: "2020/04/01/",
-			keys: []string{
-				"2020/04/01/foo",
-				"2020/04/01/bar",
-				"2020/04/01/baz",
-			},
-			want: []string{
-				"2020/04/01/foo",
-				"2020/04/01/bar",
-				"2020/04/01/baz",
-			},
-			listErr:   fmt.Errorf("failed"),
-			expectErr: fmt.Errorf(`cannot retrieve object list from S3 (bucket: "test", folder: "2020/04/01/"): failed`),
-		},
+func (m *mockAPIV2) PutObject(ctx context.Context, input *s3v2.PutObjectInput, opts ...func(*s3v2.Options)) (*s3v2.PutObjectOutput, error) {
+	if m.err != nil {
+		return nil, m.err
 	}
 
-	for name, tc := range testcases {
-		t.Run(name, func(t *testing.T) {
-			ctx := context.Background()
-
-			client := &Client{api: &mockS3API{
-				keys: tc.keys,
-				err:  tc.listErr,
-			}}
-
-			got, err := client.ListObjectKeys(ctx, tc.bucket, tc.folder)
-			if tc.expectErr == nil {
-				if err != nil {
-					t.Errorf("want no error, got %q", err.Error())
-				}
-
-				if diff := cmp.Diff(tc.want, got); diff != "" {
-					t.Errorf("-want +got:\n%s", diff)
-				}
-			} else {
-				if err == nil {
-					t.Errorf("want error %q, got nil", tc.expectErr.Error())
-				}
-
-				if err.Error() != tc.expectErr.Error() {
-					t.Errorf("want error %q, got %q", tc.expectErr.Error(), err.Error())
-				}
-			}
-		})
-	}
+	return nil, nil
 }
 
-func TestGetObject(t *testing.T) {
+func TestGetObjectV2(t *testing.T) {
 	testcases := map[string]struct {
 		bucket    string
 		key       string
@@ -165,7 +97,7 @@ func TestGetObject(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			client := &Client{api: &mockS3API{
+			client := &ClientV2{api: &mockAPIV2{
 				body: []byte(tc.body),
 				err:  tc.getErr,
 			}}
@@ -192,7 +124,111 @@ func TestGetObject(t *testing.T) {
 	}
 }
 
-func TestUpload(t *testing.T) {
+func TestListObjectKeysV2(t *testing.T) {
+	testcases := map[string]struct {
+		bucket    string
+		folder    string
+		keys      [][]string
+		want      []string
+		listErr   error
+		expectErr error
+	}{
+		"success": {
+			bucket: "test",
+			folder: "2020/04/01/",
+			keys: [][]string{
+				{
+					"2020/04/01/foo",
+					"2020/04/01/bar",
+				},
+				{
+					"2020/04/01/baz",
+				},
+			},
+			want: []string{
+				"2020/04/01/foo",
+				"2020/04/01/bar",
+				"2020/04/01/baz",
+			},
+			listErr:   nil,
+			expectErr: nil,
+		},
+		"error": {
+			bucket: "test",
+			folder: "2020/04/01/",
+			keys: [][]string{
+				{
+					"2020/04/01/foo",
+					"2020/04/01/bar",
+				},
+				{
+					"2020/04/01/baz",
+				},
+			},
+			want: []string{
+				"2020/04/01/foo",
+				"2020/04/01/bar",
+				"2020/04/01/baz",
+			},
+			listErr:   fmt.Errorf("failed"),
+			expectErr: fmt.Errorf(`cannot retrieve object list from S3 (bucket: "test", folder: "2020/04/01/"): failed`),
+		},
+	}
+
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			pages := []*s3v2.ListObjectsV2Output{}
+
+			for _, page := range tc.keys {
+				p := &s3v2.ListObjectsV2Output{}
+
+				for _, k := range page {
+					p.Contents = append(p.Contents, s3v2types.Object{
+						Key: awsv2.String(k),
+					})
+				}
+
+				pages = append(pages, p)
+			}
+
+			client := &ClientV2{
+				api: &mockAPIV2{
+					err: tc.listErr,
+				},
+				listObjectsV2PagerFactory: func(client s3v2.ListObjectsV2APIClient, params *s3v2.ListObjectsV2Input, optFns ...func(*s3v2.ListObjectsV2PaginatorOptions)) ListObjectV2Pager {
+					return &mockListObjectsV2Pager{
+						pageNum: 0,
+						pages:   pages,
+						err:     tc.listErr,
+					}
+				},
+			}
+
+			got, err := client.ListObjectKeys(ctx, tc.bucket, tc.folder)
+			if tc.expectErr == nil {
+				if err != nil {
+					t.Errorf("want no error, got %q", err.Error())
+				}
+
+				if diff := cmp.Diff(tc.want, got); diff != "" {
+					t.Errorf("-want +got:\n%s", diff)
+				}
+			} else {
+				if err == nil {
+					t.Errorf("want error %q, got nil", tc.expectErr.Error())
+				}
+
+				if err.Error() != tc.expectErr.Error() {
+					t.Errorf("want error %q, got %q", tc.expectErr.Error(), err.Error())
+				}
+			}
+		})
+	}
+}
+
+func TestUploadV2(t *testing.T) {
 	testcases := map[string]struct {
 		bucket    string
 		key       string
@@ -222,7 +258,7 @@ func TestUpload(t *testing.T) {
 
 			reader := bytes.NewReader([]byte(tc.body))
 
-			client := &Client{api: &mockS3API{
+			client := &ClientV2{api: &mockAPIV2{
 				err: tc.uploadErr,
 			}}
 

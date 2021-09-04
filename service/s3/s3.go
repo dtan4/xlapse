@@ -8,53 +8,71 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	awsv2 "github.com/aws/aws-sdk-go-v2/aws"
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 const (
 	timeFormat = "2006-01-02-15-04-05"
 )
 
-// Client represents the wrapper of S3 API Client
-type Client struct {
-	api s3iface.S3API
+type APIV2 interface {
+	GetObject(context.Context, *s3v2.GetObjectInput, ...func(*s3v2.Options)) (*s3v2.GetObjectOutput, error)
+	ListObjectsV2(context.Context, *s3v2.ListObjectsV2Input, ...func(*s3v2.Options)) (*s3v2.ListObjectsV2Output, error)
+	PutObject(context.Context, *s3v2.PutObjectInput, ...func(*s3v2.Options)) (*s3v2.PutObjectOutput, error)
 }
 
-// New creates new Client
-func New(api s3iface.S3API) *Client {
-	return &Client{
+type ListObjectV2Pager interface {
+	HasMorePages() bool
+	NextPage(context.Context, ...func(*s3v2.Options)) (*s3v2.ListObjectsV2Output, error)
+}
+
+type ListObjectsV2PagerFactory func(client s3v2.ListObjectsV2APIClient, params *s3v2.ListObjectsV2Input, optFns ...func(*s3v2.ListObjectsV2PaginatorOptions)) ListObjectV2Pager
+
+// ClientV2 represents the wrapper of S3 API Client using AWS SDK V2
+type ClientV2 struct {
+	api                       APIV2
+	listObjectsV2PagerFactory ListObjectsV2PagerFactory
+}
+
+// NewV2 creates new ClientV2
+func NewV2(api APIV2) *ClientV2 {
+	return &ClientV2{
 		api: api,
+		listObjectsV2PagerFactory: func(client s3v2.ListObjectsV2APIClient, params *s3v2.ListObjectsV2Input, optFns ...func(*s3v2.ListObjectsV2PaginatorOptions)) ListObjectV2Pager {
+			return s3v2.NewListObjectsV2Paginator(client, params)
+		},
 	}
 }
 
 // ListObjectKeys retrieves the list of keys in the given S3 bucket and folder
-func (c *Client) ListObjectKeys(ctx context.Context, bucket, folder string) ([]string, error) {
+func (c *ClientV2) ListObjectKeys(ctx context.Context, bucket, folder string) ([]string, error) {
 	keys := []string{}
 
-	err := c.api.ListObjectsV2PagesWithContext(ctx, &s3.ListObjectsV2Input{
-		Bucket: aws.String(bucket),
-		Prefix: aws.String(folder),
-	}, func(page *s3.ListObjectsV2Output, lastPage bool) bool {
-		for _, c := range page.Contents {
-			keys = append(keys, aws.StringValue(c.Key))
+	paginator := c.listObjectsV2PagerFactory(c.api, &s3v2.ListObjectsV2Input{
+		Bucket: awsv2.String(bucket),
+		Prefix: awsv2.String(folder),
+	})
+
+	for paginator.HasMorePages() {
+		out, err := paginator.NextPage(ctx)
+		if err != nil {
+			return []string{}, fmt.Errorf("cannot retrieve object list from S3 (bucket: %q, folder: %q): %w", bucket, folder, err)
 		}
 
-		return true
-	})
-	if err != nil {
-		return []string{}, fmt.Errorf("cannot retrieve object list from S3 (bucket: %q, folder: %q): %w", bucket, folder, err)
+		for _, c := range out.Contents {
+			keys = append(keys, awsv2.ToString(c.Key))
+		}
 	}
 
 	return keys, nil
 }
 
-// UploadToS3 uploads local file to the specified S3 location
-func (c *Client) GetObject(ctx context.Context, bucket, key string) ([]byte, error) {
-	out, err := c.api.GetObjectWithContext(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
+// GetObject downloads an object from the specified S3 location
+func (c *ClientV2) GetObject(ctx context.Context, bucket, key string) ([]byte, error) {
+	out, err := c.api.GetObject(ctx, &s3v2.GetObjectInput{
+		Bucket: awsv2.String(bucket),
+		Key:    awsv2.String(key),
 	})
 	if err != nil {
 		return []byte{}, fmt.Errorf("cannot download S3 object from bucket: %q, key: %q: %w", bucket, key, err)
@@ -70,10 +88,10 @@ func (c *Client) GetObject(ctx context.Context, bucket, key string) ([]byte, err
 }
 
 // Upload uploads the given stream to the given S3 location
-func (c *Client) Upload(ctx context.Context, bucket, key string, reader io.ReadSeeker) error {
-	_, err := c.api.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
+func (c *ClientV2) Upload(ctx context.Context, bucket, key string, reader io.ReadSeeker) error {
+	_, err := c.api.PutObject(ctx, &s3v2.PutObjectInput{
+		Bucket: awsv2.String(bucket),
+		Key:    awsv2.String(key),
 		Body:   reader,
 	})
 	if err != nil {

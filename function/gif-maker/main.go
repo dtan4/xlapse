@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws/session"
-	s3api "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-xray-sdk-go/xray"
+	configv2 "github.com/aws/aws-sdk-go-v2/config"
+	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
 	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/service/s3"
@@ -89,10 +89,14 @@ func HandleRequest(ctx context.Context, req *v1.GifRequest) error {
 }
 
 func do(ctx context.Context, bucket, keyPrefix string, year, month, day, delay int) error {
-	sess := session.New()
-	api := s3api.New(sess)
-	xray.AWS(api.Client)
-	s3Client := s3.New(api)
+	cfg, err := configv2.LoadDefaultConfig(ctx)
+	if err != nil {
+		return fmt.Errorf("cannot load default AWS SDK config: %w", err)
+	}
+
+	awsv2.AWSV2Instrumentor(&cfg.APIOptions)
+
+	s3Client := s3.NewV2(s3v2.NewFromConfig(cfg))
 
 	folder := s3.ComposeFolder(keyPrefix, year, month, day)
 

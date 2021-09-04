@@ -6,9 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
+	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/dtan4/xlapse/types"
@@ -19,22 +17,21 @@ var (
 	gotPayloads = [][]byte{}
 )
 
-type mockLambdaAPI struct {
-	lambdaiface.LambdaAPI
+type mockAPIV2 struct {
 	err error
 }
 
-func (m *mockLambdaAPI) InvokeWithContext(ctx context.Context, input *lambda.InvokeInput, opts ...request.Option) (*lambda.InvokeOutput, error) {
+func (m *mockAPIV2) Invoke(ctx context.Context, params *lambdav2.InvokeInput, optFns ...func(*lambdav2.Options)) (*lambdav2.InvokeOutput, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
 
-	gotPayloads = append(gotPayloads, input.Payload)
+	gotPayloads = append(gotPayloads, params.Payload)
 
-	return &lambda.InvokeOutput{}, nil
+	return &lambdav2.InvokeOutput{}, nil
 }
 
-func TestInvokeDownloaderFuncs(t *testing.T) {
+func TestInvokeDownloaderFuncsV2(t *testing.T) {
 	testcases := map[string]struct {
 		es        types.Entries
 		arn       string
@@ -91,7 +88,7 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			client := &Client{api: &mockLambdaAPI{
+			client := &ClientV2{api: &mockAPIV2{
 				err: tc.invokeErr,
 			}}
 
@@ -121,7 +118,7 @@ func TestInvokeDownloaderFuncs(t *testing.T) {
 	}
 }
 
-func TestInvokeGifMakerFuncs(t *testing.T) {
+func TestInvokeGifMakerFuncsV2(t *testing.T) {
 	testcases := map[string]struct {
 		req       *v1.GifRequest
 		arn       string
@@ -163,7 +160,7 @@ func TestInvokeGifMakerFuncs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			client := &Client{api: &mockLambdaAPI{
+			client := &ClientV2{api: &mockAPIV2{
 				err: tc.invokeErr,
 			}}
 
