@@ -35,8 +35,8 @@ def go_dependencies():
     go_repository(
         name = "com_github_aws_aws_lambda_go",
         importpath = "github.com/aws/aws-lambda-go",
-        sum = "h1:5iUHbIZ2sG6Yq/J1IN3sWm3+vAB1CWwhI21NffLNuNI=",
-        version = "v1.19.1",
+        sum = "h1:6ujqBpYF7tdZcBvPIccs98SpeGfrt/UOVEiexfNIdHA=",
+        version = "v1.26.0",
     )
     go_repository(
         name = "com_github_aws_aws_sdk_go",
