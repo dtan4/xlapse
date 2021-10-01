@@ -13,7 +13,7 @@ require (
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/golang/protobuf v1.5.0
 	github.com/google/go-cmp v0.5.6
-	go.uber.org/zap v1.19.0
+	go.uber.org/zap v1.19.1
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	sigs.k8s.io/yaml v1.2.0
