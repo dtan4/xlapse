@@ -5,7 +5,7 @@ import (
 
 	v1 "github.com/dtan4/xlapse/types/v1"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func TestDecodeEntriesYAML(t *testing.T) {
@@ -52,9 +52,7 @@ func TestDecodeEntriesYAML(t *testing.T) {
 			}
 
 			for i := range got {
-				opt := cmpopts.IgnoreUnexported(*tc.want[i])
-
-				if diff := cmp.Diff(*tc.want[i], *got[i], opt); diff != "" {
+				if diff := cmp.Diff(tc.want[i], got[i], protocmp.Transform()); diff != "" {
 					t.Errorf("-want +got:\n%s", diff)
 				}
 			}
