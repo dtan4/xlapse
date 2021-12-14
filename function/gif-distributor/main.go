@@ -18,7 +18,7 @@ import (
 	"github.com/dtan4/xlapse/service/s3"
 	"github.com/dtan4/xlapse/types"
 	v1 "github.com/dtan4/xlapse/types/v1"
-	"github.com/dtan4/xlapse/version"
+	"github.com/dtan4/xlapse/pkg/version"
 )
 
 var (
