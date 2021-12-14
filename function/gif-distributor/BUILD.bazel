@@ -6,9 +6,9 @@ go_library(
     importpath = "github.com/dtan4/xlapse/function/gif-distributor",
     visibility = ["//visibility:private"],
     deps = [
+        "//pkg/service/lambda",
+        "//pkg/service/s3",
         "//pkg/version",
-        "//service/lambda",
-        "//service/s3",
         "//types",
         "//types/v1:types",
         "@com_github_aws_aws_lambda_go//lambda",

@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "s3",
     srcs = ["s3.go"],
-    importpath = "github.com/dtan4/xlapse/service/s3",
+    importpath = "github.com/dtan4/xlapse/pkg/service/s3",
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_aws_aws_sdk_go_v2//aws",

@@ -9,8 +9,8 @@ go_library(
     importpath = "github.com/dtan4/xlapse/function/gif-maker",
     visibility = ["//visibility:private"],
     deps = [
+        "//pkg/service/s3",
         "//pkg/version",
-        "//service/s3",
         "//types/v1:types",
         "@com_github_aws_aws_lambda_go//lambda",
         "@com_github_aws_aws_sdk_go_v2_config//:config",

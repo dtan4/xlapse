@@ -14,11 +14,11 @@ import (
 	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
 	"github.com/getsentry/sentry-go"
 
-	"github.com/dtan4/xlapse/service/lambda"
-	"github.com/dtan4/xlapse/service/s3"
+	"github.com/dtan4/xlapse/pkg/service/lambda"
+	"github.com/dtan4/xlapse/pkg/service/s3"
+	"github.com/dtan4/xlapse/pkg/version"
 	"github.com/dtan4/xlapse/types"
 	v1 "github.com/dtan4/xlapse/types/v1"
-	"github.com/dtan4/xlapse/pkg/version"
 )
 
 var (

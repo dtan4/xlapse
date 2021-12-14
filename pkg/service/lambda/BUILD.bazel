@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "lambda",
     srcs = ["lambda.go"],
-    importpath = "github.com/dtan4/xlapse/service/lambda",
+    importpath = "github.com/dtan4/xlapse/pkg/service/lambda",
     visibility = ["//visibility:public"],
     deps = [
         "//types",
