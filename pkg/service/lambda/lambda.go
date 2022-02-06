@@ -2,14 +2,13 @@ package lambda
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	awsv2 "github.com/aws/aws-sdk-go-v2/aws"
 	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
 	lambdav2types "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/dtan4/xlapse/types"
 	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
@@ -27,11 +26,11 @@ func NewV2(api APIV2) *ClientV2 {
 	}
 }
 
-func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, arn string) error {
-	for _, e := range es {
-		payload, err := json.Marshal(e)
+func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es *v1.Entries, arn string) error {
+	for _, e := range es.Entries {
+		payload, err := protojson.Marshal(e)
 		if err != nil {
-			return fmt.Errorf("cannot decode entry %#v to JSON: %w", *e, err)
+			return fmt.Errorf("cannot decode entry %s to JSON: %w", e.String(), err)
 		}
 
 		_, err = c.api.Invoke(ctx, &lambdav2.InvokeInput{
@@ -40,7 +39,7 @@ func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, 
 			Payload:        payload,
 		})
 		if err != nil {
-			return fmt.Errorf("cannot invoke lambda function %q with entry %#v: %w", arn, *e, err)
+			return fmt.Errorf("cannot invoke lambda function %q with entry %s: %w", arn, e.String(), err)
 		}
 	}
 
@@ -48,7 +47,7 @@ func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, 
 }
 
 func (c *ClientV2) InvokeGifMakerFuncs(ctx context.Context, req *v1.GifRequest, arn string) error {
-	payload, err := json.Marshal(req)
+	payload, err := protojson.Marshal(req)
 	if err != nil {
 		return fmt.Errorf("cannot decode entry %#v to JSON: %w", req, err)
 	}

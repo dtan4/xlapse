@@ -97,7 +97,7 @@ func do(ctx context.Context, bucket, key, farn string) error {
 		return fmt.Errorf("cannot decode YAML: %w", err)
 	}
 
-	for _, e := range es {
+	for _, e := range es.Entries {
 		fmt.Printf("URL: %q, Bucket: %q, KeyPrefix: %q, Timezone: %q\n", e.GetUrl(), e.GetBucket(), e.GetKeyPrefix(), e.GetTimezone())
 	}
 
