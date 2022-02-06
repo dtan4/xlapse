@@ -9,7 +9,6 @@ import (
 	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/dtan4/xlapse/types"
 	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
@@ -33,25 +32,27 @@ func (m *mockAPIV2) Invoke(ctx context.Context, params *lambdav2.InvokeInput, op
 
 func TestInvokeDownloaderFuncsV2(t *testing.T) {
 	testcases := map[string]struct {
-		es        types.Entries
+		es        *v1.Entries
 		arn       string
 		want      [][]byte
 		invokeErr error
 		wantErr   error
 	}{
 		"success": {
-			es: types.Entries{
-				&v1.Entry{
-					Url:       "https://example.co.jp/foo.jpg",
-					Bucket:    "bucket",
-					KeyPrefix: "prefix",
-					Timezone:  "Asia/Tokyo",
-				},
-				&v1.Entry{
-					Url:       "https://example.com.sg/bar.png",
-					Bucket:    "bucket-sg",
-					KeyPrefix: "prefix-sg",
-					Timezone:  "Asia/Singapore",
+			es: &v1.Entries{
+				Entries: []*v1.Entry{
+					{
+						Url:       "https://example.co.jp/foo.jpg",
+						Bucket:    "bucket",
+						KeyPrefix: "prefix",
+						Timezone:  "Asia/Tokyo",
+					},
+					{
+						Url:       "https://example.com.sg/bar.png",
+						Bucket:    "bucket-sg",
+						KeyPrefix: "prefix-sg",
+						Timezone:  "Asia/Singapore",
+					},
 				},
 			},
 			arn: "foo",
@@ -63,18 +64,20 @@ func TestInvokeDownloaderFuncsV2(t *testing.T) {
 			wantErr:   nil,
 		},
 		"error": {
-			es: types.Entries{
-				&v1.Entry{
-					Url:       "https://example.co.jp/foo.jpg",
-					Bucket:    "bucket",
-					KeyPrefix: "prefix",
-					Timezone:  "Asia/Tokyo",
-				},
-				&v1.Entry{
-					Url:       "https://example.com.sg/bar.png",
-					Bucket:    "bucket-sg",
-					KeyPrefix: "prefix-sg",
-					Timezone:  "Asia/Singapore",
+			es: &v1.Entries{
+				Entries: []*v1.Entry{
+					{
+						Url:       "https://example.co.jp/foo.jpg",
+						Bucket:    "bucket",
+						KeyPrefix: "prefix",
+						Timezone:  "Asia/Tokyo",
+					},
+					{
+						Url:       "https://example.com.sg/bar.png",
+						Bucket:    "bucket-sg",
+						KeyPrefix: "prefix-sg",
+						Timezone:  "Asia/Singapore",
+					},
 				},
 			},
 			arn:       "foo",

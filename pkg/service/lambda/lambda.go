@@ -9,7 +9,6 @@ import (
 	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
 	lambdav2types "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 
-	"github.com/dtan4/xlapse/types"
 	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
@@ -27,8 +26,8 @@ func NewV2(api APIV2) *ClientV2 {
 	}
 }
 
-func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es types.Entries, arn string) error {
-	for _, e := range es {
+func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es *v1.Entries, arn string) error {
+	for _, e := range es.Entries {
 		payload, err := json.Marshal(e)
 		if err != nil {
 			return fmt.Errorf("cannot decode entry %#v to JSON: %w", *e, err)

@@ -10,3 +10,7 @@ message Entry {
   string key_prefix = 3;
   string timezone = 4;
 }
+
+message Entries {
+  repeated Entry entries = 1;
+}

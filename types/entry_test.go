@@ -3,18 +3,20 @@ package types
 import (
 	"testing"
 
-	v1 "github.com/dtan4/xlapse/types/v1"
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/testing/protocmp"
+
+	v1 "github.com/dtan4/xlapse/types/v1"
 )
 
 func TestDecodeEntriesYAML(t *testing.T) {
 	testcases := map[string]struct {
 		body []byte
-		want Entries
+		want *v1.Entries
 	}{
 		"success": {
-			body: []byte(`- url: https://example.co.jp/foo.jpg
+			body: []byte(`entries:
+- url: https://example.co.jp/foo.jpg
   bucket: bucket
   key_prefix: prefix
   timezone: Asia/Tokyo
@@ -23,18 +25,20 @@ func TestDecodeEntriesYAML(t *testing.T) {
   key_prefix: prefix-sg
   timezone: Asia/Singapore
 `),
-			want: Entries{
-				&v1.Entry{
-					Url:       "https://example.co.jp/foo.jpg",
-					Bucket:    "bucket",
-					KeyPrefix: "prefix",
-					Timezone:  "Asia/Tokyo",
-				},
-				&v1.Entry{
-					Url:       "https://example.com.sg/bar.png",
-					Bucket:    "bucket-sg",
-					KeyPrefix: "prefix-sg",
-					Timezone:  "Asia/Singapore",
+			want: &v1.Entries{
+				Entries: []*v1.Entry{
+					{
+						Url:       "https://example.co.jp/foo.jpg",
+						Bucket:    "bucket",
+						KeyPrefix: "prefix",
+						Timezone:  "Asia/Tokyo",
+					},
+					{
+						Url:       "https://example.com.sg/bar.png",
+						Bucket:    "bucket-sg",
+						KeyPrefix: "prefix-sg",
+						Timezone:  "Asia/Singapore",
+					},
 				},
 			},
 		},
@@ -47,14 +51,8 @@ func TestDecodeEntriesYAML(t *testing.T) {
 				t.Errorf("want no error, got %s", err)
 			}
 
-			if len(got) != len(tc.want) {
-				t.Errorf("want %d entries, got %d", len(tc.want), len(got))
-			}
-
-			for i := range got {
-				if diff := cmp.Diff(tc.want[i], got[i], protocmp.Transform()); diff != "" {
-					t.Errorf("-want +got:\n%s", diff)
-				}
+			if diff := cmp.Diff(tc.want, got, protocmp.Transform()); diff != "" {
+				t.Errorf("-want +got:\n%s", diff)
 			}
 		})
 	}
