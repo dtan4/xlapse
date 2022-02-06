@@ -30,7 +30,7 @@ func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es *v1.Entries, ar
 	for _, e := range es.Entries {
 		payload, err := protojson.Marshal(e)
 		if err != nil {
-			return fmt.Errorf("cannot decode entry %#v to JSON: %w", *e, err)
+			return fmt.Errorf("cannot decode entry %s to JSON: %w", e.String(), err)
 		}
 
 		_, err = c.api.Invoke(ctx, &lambdav2.InvokeInput{
@@ -39,7 +39,7 @@ func (c *ClientV2) InvokeDownloaderFuncs(ctx context.Context, es *v1.Entries, ar
 			Payload:        payload,
 		})
 		if err != nil {
-			return fmt.Errorf("cannot invoke lambda function %q with entry %#v: %w", arn, *e, err)
+			return fmt.Errorf("cannot invoke lambda function %q with entry %s: %w", arn, e.String(), err)
 		}
 	}
 

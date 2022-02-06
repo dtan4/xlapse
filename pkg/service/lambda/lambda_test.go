@@ -85,7 +85,7 @@ func TestInvokeDownloaderFuncsV2(t *testing.T) {
 			arn:       "foo",
 			want:      [][]byte{},
 			invokeErr: fmt.Errorf("cannot invoke function"),
-			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with entry v1.Entry`),
+			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with entry`),
 		},
 	}
 
@@ -173,7 +173,7 @@ func TestInvokeGifMakerFuncsV2(t *testing.T) {
 			arn:       "foo",
 			want:      [][]byte{},
 			invokeErr: fmt.Errorf("cannot invoke function"),
-			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with request &v1.GifRequest{`),
+			wantErr:   fmt.Errorf(`cannot invoke lambda function "foo" with request`),
 		},
 	}
 
