@@ -10,6 +10,7 @@ go_library(
         "@com_github_aws_aws_sdk_go_v2//aws",
         "@com_github_aws_aws_sdk_go_v2_service_lambda//:lambda",
         "@com_github_aws_aws_sdk_go_v2_service_lambda//types",
+        "@org_golang_google_protobuf//encoding/protojson",
     ],
 )
 
@@ -21,5 +22,7 @@ go_test(
         "//types/v1:types",
         "@com_github_aws_aws_sdk_go_v2_service_lambda//:lambda",
         "@com_github_google_go_cmp//cmp",
+        "@org_golang_google_protobuf//encoding/protojson",
+        "@org_golang_google_protobuf//testing/protocmp",
     ],
 )

@@ -8,6 +8,8 @@ import (
 
 	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/testing/protocmp"
 
 	v1 "github.com/dtan4/xlapse/types/v1"
 )
@@ -57,8 +59,8 @@ func TestInvokeDownloaderFuncsV2(t *testing.T) {
 			},
 			arn: "foo",
 			want: [][]byte{
-				[]byte(`{"url":"https://example.co.jp/foo.jpg","bucket":"bucket","key_prefix":"prefix","timezone":"Asia/Tokyo"}`),
-				[]byte(`{"url":"https://example.com.sg/bar.png","bucket":"bucket-sg","key_prefix":"prefix-sg","timezone":"Asia/Singapore"}`),
+				[]byte(`{"url":"https://example.co.jp/foo.jpg","bucket":"bucket","keyPrefix":"prefix","timezone":"Asia/Tokyo"}`),
+				[]byte(`{"url":"https://example.com.sg/bar.png","bucket":"bucket-sg","keyPrefix":"prefix-sg","timezone":"Asia/Singapore"}`),
 			},
 			invokeErr: nil,
 			wantErr:   nil,
@@ -101,8 +103,24 @@ func TestInvokeDownloaderFuncsV2(t *testing.T) {
 					t.Errorf("want no error, got %q", err)
 				}
 
-				if diff := cmp.Diff(tc.want, gotPayloads); diff != "" {
-					t.Errorf("-want +got:\n%s", diff)
+				if len(gotPayloads) != len(tc.want) {
+					t.Errorf("want %d entries, got %d", len(tc.want), len(gotPayloads))
+				}
+
+				for i, e := range gotPayloads {
+					var g, w v1.Entry
+
+					if err := protojson.Unmarshal(e, &g); err != nil {
+						t.Fatal(err)
+					}
+
+					if err := protojson.Unmarshal(tc.want[i], &w); err != nil {
+						t.Fatal(err)
+					}
+
+					if diff := cmp.Diff(&w, &g, protocmp.Transform()); diff != "" {
+						t.Errorf("-want +got:\n%s", diff)
+					}
 				}
 			} else {
 				if err == nil {
@@ -139,7 +157,7 @@ func TestInvokeGifMakerFuncsV2(t *testing.T) {
 			},
 			arn: "foo",
 			want: [][]byte{
-				[]byte(`{"bucket":"bucket","key_prefix":"prefix","year":2020,"month":4,"day":11}`),
+				[]byte(`{"bucket":"bucket","keyPrefix":"prefix","year":2020,"month":4,"day":11}`),
 			},
 			invokeErr: nil,
 			wantErr:   nil,
@@ -173,8 +191,24 @@ func TestInvokeGifMakerFuncsV2(t *testing.T) {
 					t.Errorf("want no error, got %q", err)
 				}
 
-				if diff := cmp.Diff(tc.want, gotPayloads); diff != "" {
-					t.Errorf("-want +got:\n%s", diff)
+				if len(gotPayloads) != len(tc.want) {
+					t.Errorf("want %d entries, got %d", len(tc.want), len(gotPayloads))
+				}
+
+				for i, e := range gotPayloads {
+					var g, w v1.GifRequest
+
+					if err := protojson.Unmarshal(e, &g); err != nil {
+						t.Fatal(err)
+					}
+
+					if err := protojson.Unmarshal(tc.want[i], &w); err != nil {
+						t.Fatal(err)
+					}
+
+					if diff := cmp.Diff(&w, &g, protocmp.Transform()); diff != "" {
+						t.Errorf("-want +got:\n%s", diff)
+					}
 				}
 			} else {
 				if err == nil {
