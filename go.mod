@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.24.1
 	github.com/aws/aws-xray-sdk-go v1.6.0
 	github.com/getsentry/sentry-go v0.12.0
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.7
 	github.com/klauspost/compress v1.14.2 // indirect
 	github.com/valyala/fasthttp v1.33.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
