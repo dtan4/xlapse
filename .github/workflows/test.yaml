@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Bazel cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: "/home/runner/.cache/bazel"
           key: bazel
