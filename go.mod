@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-lambda-go v1.30.0
 	github.com/aws/aws-sdk-go v1.42.44 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.16.2
-	github.com/aws/aws-sdk-go-v2/config v1.13.1
+	github.com/aws/aws-sdk-go-v2/config v1.15.3
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.22.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.24.1
 	github.com/aws/aws-xray-sdk-go v1.6.0
