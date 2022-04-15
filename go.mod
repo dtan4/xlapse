@@ -14,7 +14,7 @@ require (
 	github.com/google/go-cmp v0.5.7
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
-	go.uber.org/zap v1.20.0
+	go.uber.org/zap v1.21.0
 	google.golang.org/genproto v0.0.0-20220126215142-9970aeb2e350 // indirect
 	google.golang.org/grpc v1.44.0 // indirect
 	google.golang.org/protobuf v1.27.1
