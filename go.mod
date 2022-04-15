@@ -17,6 +17,6 @@ require (
 	go.uber.org/zap v1.21.0
 	google.golang.org/genproto v0.0.0-20220126215142-9970aeb2e350 // indirect
 	google.golang.org/grpc v1.44.0 // indirect
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/protobuf v1.28.0
 	sigs.k8s.io/yaml v1.3.0
 )
