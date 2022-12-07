@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.26.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.29.5
 	github.com/aws/aws-xray-sdk-go v1.8.0
-	github.com/getsentry/sentry-go v0.15.0
+	github.com/getsentry/sentry-go v0.16.0
 	github.com/google/go-cmp v0.5.9
 	go.uber.org/zap v1.24.0
 	google.golang.org/protobuf v1.28.1
