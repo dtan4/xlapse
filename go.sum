@@ -36,8 +36,8 @@ github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.21 h1:5C6XgTViS
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.21/go.mod h1:lRToEJsn+DRA9lW4O9L9+/3hjTkUzlzyzHqn8MTds5k=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.21 h1:vY5siRXvW5TrOKm2qKEf9tliBfdLxdfy0i02LOcmqUo=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.21/go.mod h1:WZvNXT1XuH8dnJM0HvOlvk+RNn7NbAPvA/ACO0QarSc=
-github.com/aws/aws-sdk-go-v2/service/lambda v1.28.0 h1:XKXmX8HjbyWKi8mU1LXKmPYDAVPEwWJ9pm5k4L7K9qU=
-github.com/aws/aws-sdk-go-v2/service/lambda v1.28.0/go.mod h1:swAeO/+tSUbMwB9EF2miaCxPDSQwzRjfnRsYaNwbeRk=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.29.0 h1:Sp35L0xlhQ+9D5hzF/KKYD3b+mvGXT2krVXKA4JSLO8=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.29.0/go.mod h1:swAeO/+tSUbMwB9EF2miaCxPDSQwzRjfnRsYaNwbeRk=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.6.2 h1:OsggywXCk9iFKdu2Aopg3e1oJITIuyW36hA/B0rqupE=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.30.1 h1:kIgvVY7PHx4gIb0na/Q9gTWJWauTwhKdaqJjX8PkIY8=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.30.1/go.mod h1:L2l2/q76teehcW7YEsgsDjqdsDTERJeX3nOMIFlgGUE=
