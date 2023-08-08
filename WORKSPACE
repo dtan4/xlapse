@@ -31,11 +31,11 @@ go_register_toolchains(version = "1.18")
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "c56b669e5898100142ff5936221b9c2854ce88379fd473d008607d3537500619",
-    strip_prefix = "protobuf-3.23.4",
+    sha256 = "bd58f4cff519e8ea3a584d5cf5e37df923088eed5807d2e4f2928080feca4a60",
+    strip_prefix = "protobuf-3.24.0",
     urls = [
-        "https://mirror.bazel.build/github.com/protocolbuffers/protobuf/archive/v3.23.4.tar.gz",
-        "https://github.com/protocolbuffers/protobuf/archive/v3.23.4.tar.gz",
+        "https://mirror.bazel.build/github.com/protocolbuffers/protobuf/archive/v3.24.0.tar.gz",
+        "https://github.com/protocolbuffers/protobuf/archive/v3.24.0.tar.gz",
     ],
 )
 
