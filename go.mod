@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-lambda-go v1.41.0
 	github.com/aws/aws-sdk-go-v2 v1.20.3
 	github.com/aws/aws-sdk-go-v2/config v1.18.35
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.3
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.38.3
 	github.com/aws/aws-xray-sdk-go v1.8.1
 	github.com/getsentry/sentry-go v0.23.0
@@ -19,7 +19,7 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/aws/aws-sdk-go v1.44.114 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.12 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.13 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.34 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.10 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.40 // indirect
