@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.21.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.44
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.6
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.40.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.40.1
 	github.com/aws/aws-xray-sdk-go v1.8.2
 	github.com/getsentry/sentry-go v0.25.0
 	github.com/google/go-cmp v0.5.9
@@ -25,11 +25,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.42 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.36 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.44 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.1.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.14 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.36 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.1.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.15 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.37 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.36 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.15.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.15.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.15.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.17.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.23.1 // indirect
