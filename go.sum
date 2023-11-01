@@ -14,8 +14,9 @@ github.com/aws/aws-sdk-go v1.44.114/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX
 github.com/aws/aws-sdk-go-v2 v1.21.2/go.mod h1:ErQhvNuEMhJjweavOYhxVkn2RUx7kQXVATHrjKtxIpM=
 github.com/aws/aws-sdk-go-v2 v1.22.0 h1:CpTS3XO3MWNel8ohoazkLZC6scvkYL2k+m0yzFJ17Hg=
 github.com/aws/aws-sdk-go-v2 v1.22.0/go.mod h1:Kd0OJtkW3Q0M0lUWGszapWjEvrXDzRW+D21JNsroB+c=
-github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.14 h1:Sc82v7tDQ/vdU1WtuSyzZ1I7y/68j//HJ6uozND1IDs=
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.14/go.mod h1:9NCTOURS8OpxvoAVHq79LK81/zC78hfRWFn+aL0SPcY=
+github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.5.0 h1:hHgLiIrTRtddC0AKcJr5s7i/hLgcpTt+q/FKxf1Zayk=
+github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.5.0/go.mod h1:w4I/v3NOWgD+qvs1NPEwhd++1h3XPHFaVxasfY6HlYQ=
 github.com/aws/aws-sdk-go-v2/config v1.20.0 h1:q2+/mqFhY0J9m3Tb5RGFE3R4sdaUkIe4k2EuDfE3c08=
 github.com/aws/aws-sdk-go-v2/config v1.20.0/go.mod h1:7+1riCZXyT+sAGvneR5j+Zl1GyfbBUNQurpQTE6FP6k=
 github.com/aws/aws-sdk-go-v2/credentials v1.14.0 h1:LQquqPE7cL55RQmA/UBoBKehDlEtMnQKm3B0Q672ePE=
@@ -41,8 +42,8 @@ github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.0 h1:dJnwy5Awv
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.0/go.mod h1:RsPWWy7u/hwmFX57sQ7MLvrvJeYyNkiMm5BaavpoU18=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.15.6 h1:9ulSU5ClouoPIYhDQdg9tpl83d5Yb91PXTKK+17q+ow=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.15.6/go.mod h1:lnc2taBsR9nTlz9meD+lhFZZ9EWY712QHrRflWpTcOA=
-github.com/aws/aws-sdk-go-v2/service/lambda v1.41.0 h1:AQK0v7JA0stOOi1cNOq4n9N3X1a3N3A2Ezt3UEyHL9o=
-github.com/aws/aws-sdk-go-v2/service/lambda v1.41.0/go.mod h1:kFs07FNyTowZkz+dGBR33xJbzGs2mkC5Kfm6/lyR5CA=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.42.0 h1:iP6YokUm3s/ac9BfGTwIJQ26vvd/VeA+8UAZkizApeg=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.42.0/go.mod h1:FDPR8tmFrKTDNdmnST4HMohVcUPxSPPt1DnQtN99U1w=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.6.2 h1:OsggywXCk9iFKdu2Aopg3e1oJITIuyW36hA/B0rqupE=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.40.2 h1:Ll5/YVCOzRB+gxPqs2uD0R7/MyATC0w85626glSKmp4=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.40.2/go.mod h1:Zjfqt7KhQK+PO1bbOsFNzKgaq7TcxzmEoDWN8lM0qzQ=
