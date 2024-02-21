@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-xray-sdk-go v1.8.3
 	github.com/getsentry/sentry-go v0.27.0
 	github.com/google/go-cmp v0.6.0
-	go.uber.org/zap v1.26.0
+	go.uber.org/zap v1.27.0
 	google.golang.org/protobuf v1.32.0
 	sigs.k8s.io/yaml v1.4.0
 )
