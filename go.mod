@@ -7,7 +7,7 @@ toolchain go1.23.0
 require (
 	github.com/aws/aws-lambda-go v1.47.0
 	github.com/aws/aws-sdk-go-v2 v1.30.4
-	github.com/aws/aws-sdk-go-v2/config v1.27.29
+	github.com/aws/aws-sdk-go-v2/config v1.27.30
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.58.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.60.1
 	github.com/aws/aws-xray-sdk-go v1.8.4
