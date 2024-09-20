@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-lambda-go v1.47.0
 	github.com/aws/aws-sdk-go-v2 v1.30.5
 	github.com/aws/aws-sdk-go-v2/config v1.27.35
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.59.0
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.60.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.62.0
 	github.com/aws/aws-xray-sdk-go v1.8.4
 	github.com/getsentry/sentry-go v0.29.0
