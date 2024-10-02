@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.31.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.39
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.62.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.63.3
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.64.0
 	github.com/aws/aws-xray-sdk-go v1.8.4
 	github.com/getsentry/sentry-go v0.29.0
 	github.com/google/go-cmp v0.6.0
