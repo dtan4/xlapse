@@ -12,8 +12,7 @@ protoc-go:
 
 .PHONY: update-bazel-files
 update-bazel-files:
-	go mod tidy
-	bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%go_dependencies
+	bazel mod tidy
 	bazel run //:gazelle
 
 .PHONY: test

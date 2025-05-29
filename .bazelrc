@@ -1,6 +1,6 @@
 test --test_output=errors
 test --test_arg=-test.v
 
-build:linux --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64
-build:linux --@io_bazel_rules_go//go/config:static
-build:linux --@io_bazel_rules_go//go/config:pure
+build:linux --platforms=@rules_go//go/toolchain:linux_amd64
+build:linux --@rules_go//go/config:static
+build:linux --@rules_go//go/config:pure
