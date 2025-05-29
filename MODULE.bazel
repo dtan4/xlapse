@@ -15,10 +15,6 @@ go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 # platforms, using the version given from the `go.mod` file.
 go_sdk.from_file(go_mod = "//:go.mod")
 
-# Download an SDK for the host OS & architecture as well as common remote execution
-# platforms, with a specific version.
-go_sdk.download(version = "1.24.3")
-
 # Another alternative is to register the Go SDK installed on the host (see the nota bene below).
 go_sdk.host()
 
