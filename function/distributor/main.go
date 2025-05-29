@@ -11,7 +11,7 @@ import (
 	configv2 "github.com/aws/aws-sdk-go-v2/config"
 	lambdav2 "github.com/aws/aws-sdk-go-v2/service/lambda"
 	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-xray-sdk-go/instrumentation/awsv2"
+	"github.com/aws/aws-xray-sdk-go/v2/instrumentation/awsv2"
 	"github.com/getsentry/sentry-go"
 
 	"github.com/dtan4/xlapse/pkg/service/lambda"
