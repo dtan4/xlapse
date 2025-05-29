@@ -1,6 +1,6 @@
 module github.com/dtan4/xlapse
 
-go 1.21
+go 1.22
 
 toolchain go1.24.3
 
@@ -14,7 +14,7 @@ require (
 	github.com/getsentry/sentry-go v0.30.0
 	github.com/google/go-cmp v0.6.0
 	go.uber.org/zap v1.27.0
-	google.golang.org/protobuf v1.36.3
+	google.golang.org/protobuf v1.36.6
 	sigs.k8s.io/yaml v1.4.0
 )
 
