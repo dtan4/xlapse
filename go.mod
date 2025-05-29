@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.71.0
 	github.com/aws/aws-xray-sdk-go v1.8.5
 	github.com/getsentry/sentry-go v0.30.0
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/protobuf v1.36.3
 	sigs.k8s.io/yaml v1.4.0
