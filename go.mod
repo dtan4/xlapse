@@ -1,6 +1,6 @@
 module github.com/dtan4/xlapse
 
-go 1.27.1
+go 1.27.2
 
 require (
 	github.com/aws/aws-lambda-go v1.55.0
